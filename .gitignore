@@ -31,3 +31,8 @@ GoogleService-Info.plist
 
 # Obsidian files
 .obsidian/workspace.json
+
+# Large compiled packages (host on GitHub Releases instead of tracking in Git)
+releases/
+*.apk
+*.deb
