@@ -1,6 +1,6 @@
-# Red AI Assistant
+# Red AI Agent
 
-Red is a private, powerful AI assistant built with Kotlin Multiplatform and Compose Multiplatform. It runs natively on Desktop (Linux, macOS, Windows) and Mobile (Android, iOS).
+Red is a private, powerful AI Agent built with Kotlin Multiplatform and Compose Multiplatform. It runs natively on Desktop (Linux, macOS, Windows) and Mobile (Android, iOS).
 
 **Creator & Maintainer:** [adithyakuruva007](https://github.com/adithyakuruva007)
 
