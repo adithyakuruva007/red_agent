@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Red
+Comment=Private AI assistant powered by LiteRT, Gemini, ChatGPT and more
+Exec=red-wrapper
+Icon=com.inspiredandroid.red
+Type=Application
+Categories=Utility;Network;
+Keywords=AI;Chat;Gemini;LLM;Assistant;
+StartupWMClass=compose-window
+Terminal=false

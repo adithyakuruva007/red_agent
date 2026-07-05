@@ -1,0 +1,14 @@
+pkgbase = red-bin
+	pkgdesc = Private AI assistant powered by LiteRT, Gemini, ChatGPT and more
+	pkgver = 2.7.0
+	pkgrel = 1
+	arch = x86_64
+	license = Apache-2.0
+	depends = hicolor-icon-theme
+	provides = red
+	conflicts = red
+	options = !strip
+	source = Red-2.7.0-linux-x86_64.tar.gz
+	sha256sums = SKIP
+
+pkgname = red-bin

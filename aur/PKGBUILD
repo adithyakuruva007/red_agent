@@ -1,0 +1,48 @@
+# Maintainer: Inspired Android
+
+pkgname=red-bin
+pkgver=2.7.0
+pkgrel=1
+pkgdesc='Private AI assistant powered by LiteRT, Gemini, ChatGPT and more'
+arch=('x86_64')
+license=('Apache-2.0')
+depends=('hicolor-icon-theme')
+provides=('red')
+conflicts=('red')
+options=('!strip')
+
+source=("Red-${pkgver}-linux-x86_64.tar.gz")
+sha256sums=('SKIP')
+
+package() {
+    # Install application files
+    install -dm755 "${pkgdir}/opt/red"
+    cp -r "${srcdir}/Red/"* "${pkgdir}/opt/red/"
+    chmod -R go-w "${pkgdir}/opt/red"
+
+    # Install wrapper script
+    install -Dm755 /dev/stdin "${pkgdir}/usr/bin/red" << 'EOF'
+#!/bin/sh
+exec /opt/red/bin/Red "$@"
+EOF
+
+    # Install desktop entry
+    install -Dm644 /dev/stdin "${pkgdir}/usr/share/applications/red.desktop" << EOF
+[Desktop Entry]
+Name=Red
+Comment=Private AI assistant powered by LiteRT, Gemini, ChatGPT and more
+Exec=red
+Icon=red
+Type=Application
+Categories=Utility;Network;
+Keywords=AI;Chat;Gemini;LLM;Assistant;
+StartupWMClass=compose-window
+Terminal=false
+EOF
+
+    # Install icon
+    install -Dm644 "${srcdir}/Red/icon.png" "${pkgdir}/usr/share/icons/hicolor/512x512/apps/red.png" 2>/dev/null || true
+
+    # Install license
+    install -Dm644 "${srcdir}/Red/LICENSE" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE" 2>/dev/null || true
+}

@@ -1,0 +1,451 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
+package com.inspiredandroid.red
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.Text
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.rememberDrawerState
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.width
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import com.inspiredandroid.red.ui.chat.composables.Sidebar
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import coil3.ImageLoader
+import coil3.PlatformContext
+import coil3.compose.setSingletonImageLoaderFactory
+import coil3.network.ktor3.KtorNetworkFetcherFactory
+import coil3.svg.SvgDecoder
+import com.inspiredandroid.red.data.AppSettings
+import com.inspiredandroid.red.data.ThemeMode
+import com.inspiredandroid.red.data.AppColorScheme
+import com.inspiredandroid.red.tools.CalendarPermissionController
+import com.inspiredandroid.red.tools.NotificationPermissionController
+import com.inspiredandroid.red.tools.SetupCalendarPermissionHandler
+import com.inspiredandroid.red.tools.SetupNotificationPermissionHandler
+import com.inspiredandroid.red.tools.SetupSmsPermissionHandler
+import com.inspiredandroid.red.tools.SetupSmsSendPermissionHandler
+import com.inspiredandroid.red.tools.SmsPermissionController
+import com.inspiredandroid.red.tools.SmsSendPermissionController
+import com.inspiredandroid.red.ui.DarkClaymorphismColorScheme
+import com.inspiredandroid.red.ui.DarkAdwaitaRedBlackColorScheme
+import com.inspiredandroid.red.ui.DarkAdwaitaBlackColorScheme
+import com.inspiredandroid.red.ui.DarkAdwaitaBlackLightBlueColorScheme
+import com.inspiredandroid.red.ui.LightAdwaitaColorScheme
+import com.inspiredandroid.red.ui.Theme
+import com.inspiredandroid.red.PlatformBackHandler
+import com.inspiredandroid.red.ui.chat.ChatScreen
+import com.inspiredandroid.red.ui.chat.ChatViewModel
+import com.inspiredandroid.red.ui.components.FullScreenImageHost
+import com.inspiredandroid.red.ui.handCursor
+import com.inspiredandroid.red.ui.rememberSandboxAwareUriHandler
+import com.inspiredandroid.red.ui.settings.SettingsScreen
+import com.inspiredandroid.red.ui.notifications.NotificationsScreen
+import com.inspiredandroid.red.ui.withBlackBackground
+
+import red.composeapp.generated.resources.Res
+import red.composeapp.generated.resources.tab_chat
+import red.composeapp.generated.resources.tab_settings
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import nl.marc_apps.tts.TextToSpeechInstance
+import nl.marc_apps.tts.experimental.ExperimentalVoiceApi
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.KoinApplication
+import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.dsl.koinConfiguration
+
+@Serializable
+@SerialName("home")
+object Home
+
+@Serializable
+@SerialName("settings")
+object Settings
+
+@Serializable
+@SerialName("notifications")
+object Notifications
+
+@Composable
+fun App(
+    navController: NavHostController,
+    lightColorScheme: ColorScheme = LightAdwaitaColorScheme,
+    darkColorScheme: ColorScheme = DarkAdwaitaBlackColorScheme,
+    textToSpeech: TextToSpeechInstance? = null,
+    isKoinStarted: Boolean = false,
+    onAppOpens: ((Int) -> Unit)? = null,
+) {
+    setSingletonImageLoaderFactory { context: PlatformContext ->
+        ImageLoader.Builder(context)
+            .components {
+                add(KtorNetworkFetcherFactory())
+                add(SvgDecoder.Factory())
+            }
+            .build()
+    }
+
+    // Reuse global Koin if already started (Android Application class),
+    // otherwise create a new instance (iOS, Desktop, Wasm).
+    if (isKoinStarted) {
+        AppContent(navController, lightColorScheme, darkColorScheme, textToSpeech, onAppOpens)
+    } else {
+        KoinApplication(
+            configuration = koinConfiguration {
+                modules(appModule)
+            },
+        ) {
+            AppContent(navController, lightColorScheme, darkColorScheme, textToSpeech, onAppOpens)
+        }
+    }
+}
+
+@Composable
+private fun AppContent(
+    navController: NavHostController,
+    lightColorScheme: ColorScheme,
+    darkColorScheme: ColorScheme,
+    textToSpeech: TextToSpeechInstance?,
+    onAppOpens: ((Int) -> Unit)?,
+) {
+    val appSettings = koinInject<AppSettings>()
+
+    // Track app opens after Koin is initialized
+    onAppOpens?.let { callback ->
+        LaunchedEffect(Unit) {
+            callback(appSettings.trackAppOpen())
+        }
+    }
+
+    // Set up permission handlers
+    val calendarPermissionController = koinInject<CalendarPermissionController>()
+    SetupCalendarPermissionHandler(calendarPermissionController)
+
+    val notificationPermissionController = koinInject<NotificationPermissionController>()
+    SetupNotificationPermissionHandler(notificationPermissionController)
+
+    val smsPermissionController = koinInject<SmsPermissionController>()
+    SetupSmsPermissionHandler(smsPermissionController)
+
+    val smsSendPermissionController = koinInject<SmsSendPermissionController>()
+    SetupSmsSendPermissionHandler(smsSendPermissionController)
+
+    // Set TTS voice to match system language
+    @OptIn(ExperimentalVoiceApi::class)
+    LaunchedEffect(textToSpeech) {
+        val tts = textToSpeech ?: return@LaunchedEffect
+        val systemLanguage = Locale.current.language
+        val matchingVoice = tts.voices
+            .firstOrNull { it.languageTag.startsWith(systemLanguage) }
+        if (matchingVoice != null) {
+            tts.currentVoice = matchingVoice
+        }
+    }
+
+    val uiScale by appSettings.uiScaleFlow.collectAsStateWithLifecycle()
+    val defaultDensity = LocalDensity.current
+    val scaledDensity = remember(defaultDensity, uiScale) {
+        Density(defaultDensity.density * uiScale, defaultDensity.fontScale)
+    }
+
+    val colorSchemeType by appSettings.colorSchemeFlow.collectAsStateWithLifecycle()
+
+    val effectiveColorScheme = when (colorSchemeType) {
+        AppColorScheme.AdwaitaRedBlack -> DarkAdwaitaRedBlackColorScheme
+        AppColorScheme.AdwaitaBlack -> DarkAdwaitaBlackColorScheme
+        AppColorScheme.AdwaitaBlackLightBlue -> DarkAdwaitaBlackLightBlueColorScheme
+        AppColorScheme.Claymorphism -> DarkClaymorphismColorScheme
+    }
+
+    val sandboxController = koinInject<SandboxController>()
+    val sandboxAwareUriHandler = rememberSandboxAwareUriHandler(sandboxController)
+
+    CompositionLocalProvider(
+        LocalDensity provides scaledDensity,
+        LocalUriHandler provides sandboxAwareUriHandler,
+    ) {
+        Theme(colorScheme = effectiveColorScheme) {
+            FullScreenImageHost {
+                val chatViewModel: ChatViewModel = koinViewModel()
+                val showTabBar = currentPlatform !is Platform.Mobile
+                val currentBackStackEntry by navController.currentBackStackEntryAsState()
+                val isHome = currentBackStackEntry?.destination?.route == "home"
+
+                var sidebarExpanded by remember { mutableStateOf(currentPlatform !is Platform.Mobile) }
+                var showSettingsInSidebar by remember { mutableStateOf(false) }
+                var showNotificationsInSidebar by remember { mutableStateOf(false) }
+                val chatUiState by chatViewModel.state.collectAsStateWithLifecycle()
+
+                LaunchedEffect(chatViewModel) {
+                    chatViewModel.navigateToNotificationsRequested.collect {
+                        if (currentPlatform is Platform.Mobile) {
+                            sidebarExpanded = true
+                            showSettingsInSidebar = false
+                            showNotificationsInSidebar = true
+                        } else {
+                            val currentDest = navController.currentBackStackEntry?.destination
+                            val hasNotifications = currentDest?.route?.endsWith("Notifications") == true
+                            if (!hasNotifications) {
+                                navController.navigate(Notifications)
+                            }
+                        }
+                    }
+                }
+
+                if (currentPlatform is Platform.Mobile) {
+                    PlatformBackHandler(enabled = sidebarExpanded || showSettingsInSidebar || showNotificationsInSidebar) {
+                        if (showSettingsInSidebar) {
+                            showSettingsInSidebar = false
+                        } else if (showNotificationsInSidebar) {
+                            showNotificationsInSidebar = false
+                        } else {
+                            sidebarExpanded = false
+                        }
+                    }
+                    Box(Modifier.fillMaxSize()) {
+                        val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+                        val keyboardController = LocalSoftwareKeyboardController.current
+                        LaunchedEffect(sidebarExpanded) {
+                            if (sidebarExpanded) {
+                                drawerState.open()
+                                keyboardController?.hide()
+                            } else {
+                                drawerState.close()
+                            }
+                        }
+                        LaunchedEffect(drawerState.isOpen) {
+                            sidebarExpanded = drawerState.isOpen
+                            if (drawerState.isOpen) {
+                                keyboardController?.hide()
+                            }
+                        }
+
+                        ModalNavigationDrawer(
+                            drawerState = drawerState,
+                            gesturesEnabled = !showSettingsInSidebar && !showNotificationsInSidebar,
+                            drawerContent = {
+                                ModalDrawerSheet(
+                                    drawerContainerColor = MaterialTheme.colorScheme.background,
+                                    modifier = Modifier.fillMaxHeight().width(280.dp)
+                                ) {
+                                    Sidebar(
+                                        state = chatUiState,
+                                        currentConversationId = chatUiState.currentConversationId,
+                                        onNavigateToSettings = {
+                                            showSettingsInSidebar = true
+                                        },
+                                        onNavigateToNotifications = {
+                                            showNotificationsInSidebar = true
+                                        },
+                                        onToggleSidebar = { sidebarExpanded = false },
+                                        modifier = Modifier.fillMaxSize(),
+                                        onNewChatClicked = {
+                                            showSettingsInSidebar = false
+                                            showNotificationsInSidebar = false
+                                            sidebarExpanded = false
+                                        },
+                                        onConversationClicked = { _ ->
+                                            showSettingsInSidebar = false
+                                            showNotificationsInSidebar = false
+                                            sidebarExpanded = false
+                                        }
+                                    )
+                                }
+                            },
+                            content = {
+                                NavHost(
+                                    navController,
+                                    startDestination = Home,
+                                    modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
+                                ) {
+                                    composable<Home> {
+                                        ChatScreen(
+                                            viewModel = chatViewModel,
+                                            textToSpeech = textToSpeech,
+                                            onNavigateToSettings = {
+                                                sidebarExpanded = true
+                                                showSettingsInSidebar = true
+                                                showNotificationsInSidebar = false
+                                            },
+                                            onNavigateToNotifications = {
+                                                sidebarExpanded = true
+                                                showNotificationsInSidebar = true
+                                                showSettingsInSidebar = false
+                                            },
+                                            isSandboxAvailable = currentPlatform is Platform.Mobile.Android,
+                                            navigationTabBar = null,
+                                            onToggleSidebar = { sidebarExpanded = true },
+                                            isSidebarExpanded = false,
+                                        )
+                                    }
+                                }
+                            }
+                        )
+
+                        if (showSettingsInSidebar) {
+                            Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+                                SettingsScreen(
+                                    onNavigateBack = {
+                                        chatViewModel.refreshSettings()
+                                        showSettingsInSidebar = false
+                                    },
+                                    navigationTabBar = null,
+                                    onToggleSidebar = { sidebarExpanded = false },
+                                    isSidebarExpanded = sidebarExpanded,
+                                )
+                            }
+                        } else if (showNotificationsInSidebar) {
+                            Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+                                NotificationsScreen(
+                                    state = chatUiState,
+                                    onNavigateBack = {
+                                        showNotificationsInSidebar = false
+                                    },
+                                    onNotificationClicked = { _ ->
+                                        showNotificationsInSidebar = false
+                                        sidebarExpanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                } else {
+                    Row(Modifier.fillMaxSize()) {
+                        if (sidebarExpanded) {
+                            Sidebar(
+                                state = chatUiState,
+                                currentConversationId = chatUiState.currentConversationId,
+                                onNavigateToSettings = {
+                                    val currentRoute = navController.currentBackStackEntry?.destination?.route ?: ""
+                                    if (currentRoute.contains("settings", ignoreCase = true)) {
+                                        navController.navigate(Home) {
+                                            popUpTo(Home) { inclusive = true }
+                                        }
+                                    } else {
+                                        navController.navigate(Settings)
+                                    }
+                                },
+                                onNavigateToNotifications = {
+                                    val currentRoute = navController.currentBackStackEntry?.destination?.route ?: ""
+                                    if (currentRoute.contains("notifications", ignoreCase = true)) {
+                                        navController.navigate(Home) {
+                                            popUpTo(Home) { inclusive = true }
+                                        }
+                                    } else {
+                                        navController.navigate(Notifications)
+                                    }
+                                },
+                                onToggleSidebar = { sidebarExpanded = false },
+                                modifier = Modifier.width(280.dp).fillMaxHeight(),
+                                onNewChatClicked = {
+                                    navController.navigate(Home) {
+                                        popUpTo(Home) { inclusive = true }
+                                    }
+                                },
+                                onConversationClicked = { _ ->
+                                    navController.navigate(Home) {
+                                        popUpTo(Home) { inclusive = true }
+                                    }
+                                }
+                            )
+                        }
+
+                        Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
+                            NavHost(
+                                navController,
+                                startDestination = Home,
+                                modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
+                            ) {
+                                composable<Home> {
+                                    ChatScreen(
+                                        viewModel = chatViewModel,
+                                        textToSpeech = textToSpeech,
+                                        onNavigateToSettings = {
+                                            val currentRoute = navController.currentBackStackEntry?.destination?.route ?: ""
+                                            if (currentRoute.contains("settings", ignoreCase = true)) {
+                                                navController.navigate(Home) {
+                                                    popUpTo(Home) { inclusive = true }
+                                                }
+                                            } else {
+                                                navController.navigate(Settings)
+                                            }
+                                        },
+                                        onNavigateToNotifications = {
+                                            val currentRoute = navController.currentBackStackEntry?.destination?.route ?: ""
+                                            if (currentRoute.contains("notifications", ignoreCase = true)) {
+                                                navController.navigate(Home) {
+                                                    popUpTo(Home) { inclusive = true }
+                                                }
+                                            } else {
+                                                navController.navigate(Notifications)
+                                            }
+                                        },
+                                        isSandboxAvailable = currentPlatform is Platform.Mobile.Android,
+                                        navigationTabBar = null,
+                                        onToggleSidebar = { sidebarExpanded = !sidebarExpanded },
+                                        isSidebarExpanded = sidebarExpanded,
+                                    )
+                                }
+                                composable<Settings> {
+                                    SettingsScreen(
+                                        onNavigateBack = {
+                                            chatViewModel.refreshSettings()
+                                            navController.navigateUp()
+                                        },
+                                        navigationTabBar = null,
+                                        onToggleSidebar = { sidebarExpanded = !sidebarExpanded },
+                                        isSidebarExpanded = sidebarExpanded,
+                                    )
+                                }
+                                composable<Notifications> {
+                                    NotificationsScreen(
+                                        state = chatUiState,
+                                        onNavigateBack = {
+                                            navController.navigateUp()
+                                        },
+                                        onNotificationClicked = { _ ->
+                                            navController.popBackStack(Home, inclusive = false)
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

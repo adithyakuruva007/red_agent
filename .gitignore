@@ -1,0 +1,33 @@
+# Android & Gradle
+.gradle/
+build/
+**/build/
+local.properties
+
+# Local SDK Directory
+android-sdk/
+/android-sdk/
+
+# Kotlin / Kotlin Multiplatform Caches
+.kotlin/
+.konan/
+
+# IDE files
+.idea/
+*.iml
+*.iws
+.out/
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# User config & databases (ignored for safety)
+*.db
+*.sqlite
+secrets.properties
+google-services.json
+GoogleService-Info.plist
+
+# Obsidian files
+.obsidian/workspace.json
