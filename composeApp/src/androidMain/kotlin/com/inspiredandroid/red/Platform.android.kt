@@ -53,6 +53,7 @@ import com.inspiredandroid.red.tools.ShellCommandTool
 import com.inspiredandroid.red.tools.SmsTools
 import com.inspiredandroid.red.tools.SshConfigureHostTool
 import com.inspiredandroid.red.tools.WebSearchTool
+import com.inspiredandroid.red.tools.WebBrowserTools
 import com.russhwolf.settings.BuildConfig
 import com.russhwolf.settings.Settings
 import com.russhwolf.settings.SharedPreferencesSettings
@@ -231,6 +232,7 @@ actual fun getPlatformToolDefinitions(): List<ToolInfo> = buildList {
             descriptionRes = Res.string.tool_open_file_description,
         ),
     )
+    addAll(WebBrowserTools.browserToolDefinitions)
     // SMS tools are intentionally absent here: availability is driven by the Agent-tab
     // master toggles (isSmsEnabled / isSmsSendEnabled) plus the FOSS-only `isSmsSupported`
     // check in `getAvailableTools()`. Listing per-tool toggles in the Tools tab was dead
@@ -264,6 +266,19 @@ actual fun getAvailableTools(): List<Tool> {
 
         if (appSettings.isToolEnabled(WebSearchTool.schema.name)) {
             add(WebSearchTool)
+        }
+
+        if (appSettings.isToolEnabled(WebBrowserTools.browserNavigateTool.schema.name)) {
+            add(WebBrowserTools.browserNavigateTool)
+        }
+        if (appSettings.isToolEnabled(WebBrowserTools.browserExtractTool.schema.name)) {
+            add(WebBrowserTools.browserExtractTool)
+        }
+        if (appSettings.isToolEnabled(WebBrowserTools.browserInteractTool.schema.name)) {
+            add(WebBrowserTools.browserInteractTool)
+        }
+        if (appSettings.isToolEnabled(WebBrowserTools.browserScreenshotTool.schema.name)) {
+            add(WebBrowserTools.browserScreenshotTool)
         }
 
         if (appSettings.isToolEnabled("send_notification")) {
@@ -689,4 +704,13 @@ val writeFileTool = object : Tool {
             mapOf("success" to false, "error" to "Failed to write file: ${e.message}")
         }
     }
+}
+
+actual fun saveTempScreenshot(bytes: ByteArray): String? = try {
+    val context: Context by inject(Context::class.java)
+    val file = java.io.File(context.cacheDir, "screenshot_${System.currentTimeMillis()}.png")
+    file.outputStream().use { it.write(bytes) }
+    file.absolutePath
+} catch (_: Exception) {
+    null
 }

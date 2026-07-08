@@ -32,6 +32,7 @@ import com.inspiredandroid.red.tools.HeartbeatTools
 import com.inspiredandroid.red.tools.ProcessManagerTool
 import com.inspiredandroid.red.tools.SchedulingTools
 import com.inspiredandroid.red.tools.ShellCommandTool
+import com.inspiredandroid.red.tools.WebBrowserTools
 import com.russhwolf.settings.Settings
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.PlatformFile
@@ -149,7 +150,7 @@ actual fun createSecureSettings(): Settings = EncryptedFileSettings()
 
 actual fun createLegacySettings(): Settings? = null // Same storage location, no migration needed
 
-actual fun getPlatformToolDefinitions(): List<ToolInfo> = listOf(ShellCommandTool.toolInfo, ProcessManagerTool.toolInfo) + CommonTools.commonToolDefinitions
+actual fun getPlatformToolDefinitions(): List<ToolInfo> = listOf(ShellCommandTool.toolInfo, ProcessManagerTool.toolInfo) + CommonTools.commonToolDefinitions + WebBrowserTools.browserToolDefinitions
 
 actual fun getAvailableTools(): List<Tool> {
     val appSettings: AppSettings by inject(AppSettings::class.java)
@@ -181,6 +182,19 @@ actual fun getAvailableTools(): List<Tool> {
         }
         if (appSettings.isToolEnabled("write_file", defaultEnabled = true)) {
             add(writeFileTool)
+        }
+
+        if (appSettings.isToolEnabled(WebBrowserTools.browserNavigateTool.schema.name)) {
+            add(WebBrowserTools.browserNavigateTool)
+        }
+        if (appSettings.isToolEnabled(WebBrowserTools.browserExtractTool.schema.name)) {
+            add(WebBrowserTools.browserExtractTool)
+        }
+        if (appSettings.isToolEnabled(WebBrowserTools.browserInteractTool.schema.name)) {
+            add(WebBrowserTools.browserInteractTool)
+        }
+        if (appSettings.isToolEnabled(WebBrowserTools.browserScreenshotTool.schema.name)) {
+            add(WebBrowserTools.browserScreenshotTool)
         }
 
         val mcpServerManager: McpServerManager by inject(McpServerManager::class.java)
@@ -365,5 +379,13 @@ val writeFileTool = object : Tool {
             mapOf("success" to false, "error" to "Failed to write file: ${e.message}")
         }
     }
+}
+
+actual fun saveTempScreenshot(bytes: ByteArray): String? = try {
+    val file = java.io.File(System.getProperty("java.io.tmpdir"), "screenshot_${System.currentTimeMillis()}.png")
+    file.outputStream().use { it.write(bytes) }
+    file.absolutePath
+} catch (_: Exception) {
+    null
 }
 

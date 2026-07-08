@@ -103,3 +103,5 @@ expect suspend fun saveFileToDevice(bytes: ByteArray, baseName: String, extensio
 expect fun sendHeartbeatNotification(title: String, body: String)
 
 expect fun PlatformFile.getPlatformPath(): String?
+
+expect fun saveTempScreenshot(bytes: ByteArray): String?
