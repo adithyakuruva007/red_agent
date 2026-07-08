@@ -481,7 +481,7 @@ actual fun getAvailableTools(): List<Tool> {
             val smsSender: SmsSender by inject(SmsSender::class.java)
             if (smsSender.hasPermission()) {
                 val smsDraftStore: SmsDraftStore by inject(SmsDraftStore::class.java)
-                addAll(SmsTools.getSmsSendTools(smsDraftStore, smsReaderForTools, smsSender))
+                addAll(SmsTools.getSmsSendTools(appSettings, smsDraftStore, smsReaderForTools, smsSender))
             }
         }
 

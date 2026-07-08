@@ -8,6 +8,7 @@ import red.composeapp.generated.resources.error_all_services_failed
 import red.composeapp.generated.resources.error_bad_request
 import red.composeapp.generated.resources.error_content_moderation
 import red.composeapp.generated.resources.error_context_window_exceeded
+import red.composeapp.generated.resources.error_no_service_configured
 import red.composeapp.generated.resources.error_empty_response
 import red.composeapp.generated.resources.error_file_too_large
 import red.composeapp.generated.resources.error_image_too_large
@@ -60,6 +61,7 @@ class OpenAICompatibleBadRequestException(detail: String? = null) : OpenAICompat
 class ContextWindowExceededException : ApiException(null)
 class UnsupportedFileTypeException : ApiException(null)
 class FileTooLargeException : ApiException(null)
+class NoServiceConfiguredException : ApiException(null)
 class AllServicesFailedException : ApiException(null)
 
 sealed interface UiError {
@@ -74,6 +76,8 @@ fun Exception.toUiError(): UiError = when (this) {
     is FileTooLargeException -> UiError.Resource(Res.string.error_file_too_large)
 
     is ContextWindowExceededException -> UiError.Resource(Res.string.error_context_window_exceeded)
+
+    is NoServiceConfiguredException -> UiError.Resource(Res.string.error_no_service_configured)
 
     is AllServicesFailedException -> UiError.Resource(Res.string.error_all_services_failed)
 

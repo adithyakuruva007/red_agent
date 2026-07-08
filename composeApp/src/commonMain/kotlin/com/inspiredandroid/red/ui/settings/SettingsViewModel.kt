@@ -107,6 +107,10 @@ class SettingsViewModel(
         smsSyncState = dataRepository.getSmsSyncState(),
         isSmsSendEnabled = dataRepository.isSmsSendEnabled(),
         smsSendPermissionGranted = dataRepository.hasSmsSendPermission(),
+        isSmsSendAutonomous = dataRepository.isSmsSendAutonomous(),
+        showContactsSection = currentPlatform is Platform.Mobile,
+        isContactsEnabled = dataRepository.isContactsEnabled(),
+        contactsPermissionGranted = dataRepository.hasContactsPermission(),
         showNotificationsSection = isNotificationsSupported,
         isNotificationsEnabled = dataRepository.isNotificationsEnabled(),
         notificationListenerAccessGranted = dataRepository.isNotificationListenerAccessGranted(),
@@ -161,6 +165,8 @@ class SettingsViewModel(
         onChangeSmsPollInterval = ::onChangeSmsPollInterval,
         onRefreshSms = ::onRefreshSms,
         onToggleSmsSend = ::onToggleSmsSend,
+        onToggleSmsSendAutonomous = ::onToggleSmsSendAutonomous,
+        onToggleContacts = ::onToggleContacts,
         onToggleNotifications = ::onToggleNotifications,
         onOpenNotificationListenerSettings = ::onOpenNotificationListenerSettings,
         onClearPendingNotifications = ::onClearPendingNotifications,
@@ -581,6 +587,24 @@ class SettingsViewModel(
         } else {
             dataRepository.setSmsSendEnabled(enabled)
             _state.update { it.copy(isSmsSendEnabled = enabled) }
+        }
+    }
+
+    private fun onToggleSmsSendAutonomous(autonomous: Boolean) {
+        dataRepository.setSmsSendAutonomous(autonomous)
+        _state.update { it.copy(isSmsSendAutonomous = autonomous) }
+    }
+
+    private fun onToggleContacts(enabled: Boolean) {
+        if (enabled && !dataRepository.hasContactsPermission()) {
+            viewModelScope.launch(backgroundDispatcher) {
+                val granted = dataRepository.requestContactsPermission()
+                _state.update { it.copy(contactsPermissionGranted = granted, isContactsEnabled = granted) }
+                if (granted) dataRepository.setContactsEnabled(true)
+            }
+        } else {
+            dataRepository.setContactsEnabled(enabled)
+            _state.update { it.copy(isContactsEnabled = enabled) }
         }
     }
 

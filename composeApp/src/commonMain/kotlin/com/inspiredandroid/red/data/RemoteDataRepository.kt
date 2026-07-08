@@ -28,6 +28,7 @@ import com.inspiredandroid.red.network.AllServicesFailedException
 import com.inspiredandroid.red.network.AnthropicInsufficientCreditsException
 import com.inspiredandroid.red.network.ContextWindowExceededException
 import com.inspiredandroid.red.network.FileTooLargeException
+import com.inspiredandroid.red.network.NoServiceConfiguredException
 import com.inspiredandroid.red.network.OpenAICompatibleEmptyResponseException
 import com.inspiredandroid.red.network.OpenAICompatibleQuotaExhaustedException
 import com.inspiredandroid.red.network.Requests
@@ -47,6 +48,7 @@ import com.inspiredandroid.red.sms.SmsReader
 import com.inspiredandroid.red.sms.SmsSendResult
 import com.inspiredandroid.red.sms.SmsSender
 import com.inspiredandroid.red.tools.CommonTools
+import com.inspiredandroid.red.tools.ContactsPermissionController
 import com.inspiredandroid.red.tools.NotificationListenerController
 import com.inspiredandroid.red.tools.SmsPermissionController
 import com.inspiredandroid.red.tools.SmsSendPermissionController
@@ -158,6 +160,7 @@ class RemoteDataRepository(
     private val smsReader: SmsReader,
     private val smsPermissionController: SmsPermissionController,
     private val smsSendPermissionController: SmsSendPermissionController,
+    private val contactsPermissionController: ContactsPermissionController,
     private val smsSender: SmsSender,
     private val smsDraftStore: SmsDraftStore,
     private val notificationStore: NotificationStore,
@@ -900,6 +903,10 @@ class RemoteDataRepository(
 
         val conversationId = getTargetConversationId()
         val fallbackEntries = getOrderedFallbackEntries(conversationId).filter { hasValidInstanceApiKey(it.instanceId, it.service) }
+
+        if (fallbackEntries.isEmpty()) {
+            throw NoServiceConfiguredException()
+        }
 
         val historyChars = messages.sumOf { it.content.length } + (systemPrompt?.length ?: 0)
 
@@ -2027,6 +2034,12 @@ class RemoteDataRepository(
         appSettings.setSmsSendEnabled(enabled)
     }
 
+    override fun isSmsSendAutonomous(): Boolean = appSettings.isSmsSendAutonomous()
+
+    override fun setSmsSendAutonomous(autonomous: Boolean) {
+        appSettings.setSmsSendAutonomous(autonomous)
+    }
+
     override fun hasSmsSendPermission(): Boolean = smsSender.hasPermission()
 
     override suspend fun requestSmsSendPermission(): Boolean = smsSendPermissionController.requestPermission()
@@ -2055,6 +2068,17 @@ class RemoteDataRepository(
     override suspend fun discardSmsDraft(draftId: String) {
         smsDraftStore.removeDraft(draftId)
     }
+
+    // Contacts
+    override fun isContactsEnabled(): Boolean = appSettings.isContactsEnabled()
+
+    override fun setContactsEnabled(enabled: Boolean) {
+        appSettings.setContactsEnabled(enabled)
+    }
+
+    override fun hasContactsPermission(): Boolean = contactsPermissionController.hasPermission()
+
+    override suspend fun requestContactsPermission(): Boolean = contactsPermissionController.requestPermission()
 
     override fun isNotificationsEnabled(): Boolean = appSettings.isNotificationsEnabled()
 

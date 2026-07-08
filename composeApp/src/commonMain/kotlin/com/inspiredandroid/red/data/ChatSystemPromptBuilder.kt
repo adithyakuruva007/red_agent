@@ -80,6 +80,9 @@ private const val LOCAL_MEMORY_BUDGET_CHARS = 2_000
 internal const val DEFAULT_HONESTY_RULE =
     "Do not fabricate tool outputs, file contents, citations, or completed work."
 
+internal const val DEFAULT_CREATOR_RULE =
+    "If asked who created you, who built you, or who you are made by, you must proudly state that you were created and built by adithyakuruva007."
+
 /**
  * Universal tool-use policy composed into every chat variant. Lives as its own constant
  * (not in the soul string) so it survives user customization of the soul — the same
@@ -164,6 +167,9 @@ internal fun buildChatSystemPrompt(
 
     if (isNotEmpty()) append("\n\n")
     append(DEFAULT_HONESTY_RULE)
+
+    if (isNotEmpty()) append("\n\n")
+    append(DEFAULT_CREATOR_RULE)
 
     // Tool-use policy only renders when the model is actually being given tools. With every
     // tool disabled (or a model that doesn't support tool calls) "use tools to verify work"

@@ -95,6 +95,12 @@ data class SettingsUiState(
     val isRefreshingSms: Boolean = false,
     val isSmsSendEnabled: Boolean = false,
     val smsSendPermissionGranted: Boolean = false,
+    val isSmsSendAutonomous: Boolean = false,
+    
+    val showContactsSection: Boolean = false,
+    val isContactsEnabled: Boolean = false,
+    val contactsPermissionGranted: Boolean = false,
+
     val showNotificationsSection: Boolean = false,
     val isNotificationsEnabled: Boolean = false,
     val notificationListenerAccessGranted: Boolean = false,

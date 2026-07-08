@@ -1,9 +1,12 @@
 package com.inspiredandroid.red.tools
 
+import com.inspiredandroid.red.data.AppSettings
 import com.inspiredandroid.red.data.SmsDraft
+import com.inspiredandroid.red.data.SmsDraftStatus
 import com.inspiredandroid.red.data.SmsDraftStore
 import com.inspiredandroid.red.data.SmsMessage
 import com.inspiredandroid.red.data.SmsStore
+import com.inspiredandroid.red.sms.SmsSendResult
 import com.inspiredandroid.red.network.tools.ParameterSchema
 import com.inspiredandroid.red.network.tools.Tool
 import com.inspiredandroid.red.network.tools.ToolInfo
@@ -175,12 +178,12 @@ object SmsTools {
     )
 
     @OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
-    fun sendSmsTool(smsDraftStore: SmsDraftStore, smsSender: SmsSender) = object : Tool {
+    fun sendSmsTool(appSettings: AppSettings, smsDraftStore: SmsDraftStore, smsSender: SmsSender) = object : Tool {
         override val schema = ToolSchema(
             name = "send_sms",
-            description = "Draft an outgoing SMS. The draft is staged in a banner at the top of the chat " +
-                "so the user must explicitly tap Send before anything is actually sent. You cannot bypass this — " +
-                "the tool only creates the draft. After calling, tell the user what you drafted and ask them to review.",
+            description = "Draft an outgoing SMS. If autonomous sending is disabled, the draft is staged in a banner at the top of the chat " +
+                "so the user must explicitly tap Send before anything is actually sent. If autonomous sending is enabled, " +
+                "the SMS is sent automatically. You should tell the user whether the SMS was sent or drafted.",
             parameters = mapOf(
                 "to" to ParameterSchema(type = "string", description = "Recipient phone number", required = true),
                 "body" to ParameterSchema(type = "string", description = "Message text", required = true),
@@ -199,29 +202,60 @@ object SmsTools {
             if (to.isNullOrBlank()) return mapOf("success" to false, "error" to "Missing to")
             if (body.isNullOrEmpty()) return mapOf("success" to false, "error" to "Missing body")
 
+            val isAutonomous = appSettings.isSmsSendAutonomous()
             val draft = SmsDraft(
                 id = Uuid.random().toString(),
                 address = to,
                 body = body,
                 createdAtEpochMs = Clock.System.now().toEpochMilliseconds(),
+                status = if (isAutonomous) SmsDraftStatus.SENDING else SmsDraftStatus.PENDING,
             )
             smsDraftStore.addDraft(draft)
-            return mapOf(
-                "success" to true,
-                "draft_id" to draft.id,
-                "to" to to,
-                "body" to body,
-                "message" to "Draft created. Waiting for the user to tap Send in the review banner — nothing has been sent yet.",
-            )
+
+            if (isAutonomous) {
+                return when (val result = smsSender.send(to, body)) {
+                    is SmsSendResult.Success -> {
+                        smsDraftStore.updateStatus(draft.id, SmsDraftStatus.SENT)
+                        mapOf(
+                            "success" to true,
+                            "sent" to true,
+                            "draft_id" to draft.id,
+                            "to" to to,
+                            "body" to body,
+                            "message" to "SMS sent successfully autonomously.",
+                        )
+                    }
+                    is SmsSendResult.Failure -> {
+                        smsDraftStore.updateStatus(draft.id, SmsDraftStatus.FAILED, result.message)
+                        mapOf(
+                            "success" to false,
+                            "sent" to false,
+                            "draft_id" to draft.id,
+                            "to" to to,
+                            "body" to body,
+                            "error" to result.message,
+                        )
+                    }
+                }
+            } else {
+                return mapOf(
+                    "success" to true,
+                    "sent" to false,
+                    "draft_id" to draft.id,
+                    "to" to to,
+                    "body" to body,
+                    "message" to "Draft created. Waiting for the user to tap Send in the review banner — nothing has been sent yet.",
+                )
+            }
         }
     }
 
     @OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
-    fun replySmsTool(smsDraftStore: SmsDraftStore, smsReader: SmsReader, smsSender: SmsSender) = object : Tool {
+    fun replySmsTool(appSettings: AppSettings, smsDraftStore: SmsDraftStore, smsReader: SmsReader, smsSender: SmsSender) = object : Tool {
         override val schema = ToolSchema(
             name = "reply_sms",
             description = "Draft a reply to a received SMS. Looks up the original by id to pick the sender, then stages a draft " +
-                "in the review banner — the user must tap Send to actually send.",
+                "in the review banner (or sends it automatically if autonomous sending is enabled).",
             parameters = mapOf(
                 "sms_id" to ParameterSchema(type = "integer", description = "Id of the SMS being replied to (from check_sms / search_sms)", required = true),
                 "body" to ParameterSchema(type = "string", description = "Reply text", required = true),
@@ -246,32 +280,66 @@ object SmsTools {
                 return mapOf("success" to false, "error" to "Original SMS has no sender address to reply to")
             }
 
+            val isAutonomous = appSettings.isSmsSendAutonomous()
             val draft = SmsDraft(
                 id = Uuid.random().toString(),
                 address = original.address,
                 body = body,
                 createdAtEpochMs = Clock.System.now().toEpochMilliseconds(),
                 inReplyToSmsId = smsId,
+                status = if (isAutonomous) SmsDraftStatus.SENDING else SmsDraftStatus.PENDING,
             )
             smsDraftStore.addDraft(draft)
-            return mapOf(
-                "success" to true,
-                "draft_id" to draft.id,
-                "to" to original.address,
-                "body" to body,
-                "in_reply_to" to smsId,
-                "message" to "Reply draft created. Waiting for the user to tap Send in the review banner — nothing has been sent yet.",
-            )
+
+            if (isAutonomous) {
+                return when (val result = smsSender.send(original.address, body)) {
+                    is SmsSendResult.Success -> {
+                        smsDraftStore.updateStatus(draft.id, SmsDraftStatus.SENT)
+                        mapOf(
+                            "success" to true,
+                            "sent" to true,
+                            "draft_id" to draft.id,
+                            "to" to original.address,
+                            "body" to body,
+                            "in_reply_to" to smsId,
+                            "message" to "Reply SMS sent successfully autonomously.",
+                        )
+                    }
+                    is SmsSendResult.Failure -> {
+                        smsDraftStore.updateStatus(draft.id, SmsDraftStatus.FAILED, result.message)
+                        mapOf(
+                            "success" to false,
+                            "sent" to false,
+                            "draft_id" to draft.id,
+                            "to" to original.address,
+                            "body" to body,
+                            "in_reply_to" to smsId,
+                            "error" to result.message,
+                        )
+                    }
+                }
+            } else {
+                return mapOf(
+                    "success" to true,
+                    "sent" to false,
+                    "draft_id" to draft.id,
+                    "to" to original.address,
+                    "body" to body,
+                    "in_reply_to" to smsId,
+                    "message" to "Reply draft created. Waiting for the user to tap Send in the review banner — nothing has been sent yet.",
+                )
+            }
         }
     }
 
     fun getSmsSendTools(
+        appSettings: AppSettings,
         smsDraftStore: SmsDraftStore,
         smsReader: SmsReader,
         smsSender: SmsSender,
     ): List<Tool> = listOf(
-        sendSmsTool(smsDraftStore, smsSender),
-        replySmsTool(smsDraftStore, smsReader, smsSender),
+        sendSmsTool(appSettings, smsDraftStore, smsSender),
+        replySmsTool(appSettings, smsDraftStore, smsReader, smsSender),
     )
 
     private const val SEARCH_LIMIT = 20

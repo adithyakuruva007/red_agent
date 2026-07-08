@@ -91,6 +91,11 @@ import red.composeapp.generated.resources.settings_sms_refresh
 import red.composeapp.generated.resources.settings_sms_send_description
 import red.composeapp.generated.resources.settings_sms_send_label
 import red.composeapp.generated.resources.settings_sms_send_permission_required
+import red.composeapp.generated.resources.settings_sms_autonomous_description
+import red.composeapp.generated.resources.settings_sms_autonomous_label
+import red.composeapp.generated.resources.settings_contacts_description
+import red.composeapp.generated.resources.settings_contacts_label
+import red.composeapp.generated.resources.settings_contacts_permission_required
 import red.composeapp.generated.resources.settings_soul_reset
 import red.composeapp.generated.resources.settings_soul_reset_cancel
 import red.composeapp.generated.resources.settings_soul_save
@@ -553,10 +558,12 @@ internal fun SmsSection(
     isRefreshing: Boolean,
     isSmsSendEnabled: Boolean,
     sendPermissionGranted: Boolean,
+    isSmsSendAutonomous: Boolean,
     onToggleSms: (Boolean) -> Unit,
     onChangePollInterval: (Int) -> Unit,
     onRefresh: () -> Unit,
     onToggleSmsSend: (Boolean) -> Unit,
+    onToggleSmsSendAutonomous: (Boolean) -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         ToggleableHeadline(
@@ -638,12 +645,47 @@ internal fun SmsSection(
             onCheckedChange = onToggleSmsSend,
         )
 
-        if (isSmsSendEnabled && !sendPermissionGranted) {
+        if (isSmsSendEnabled) {
+            if (!sendPermissionGranted) {
+                Spacer(Modifier.height(8.dp))
+                PermissionRequiredRow(
+                    message = stringResource(Res.string.settings_sms_send_permission_required),
+                    buttonLabel = stringResource(Res.string.settings_sms_permission_button),
+                    onGrant = { onToggleSmsSend(true) },
+                )
+            } else {
+                Spacer(Modifier.height(12.dp))
+                ToggleableHeadline(
+                    title = stringResource(Res.string.settings_sms_autonomous_label),
+                    description = stringResource(Res.string.settings_sms_autonomous_description),
+                    checked = isSmsSendAutonomous,
+                    onCheckedChange = onToggleSmsSendAutonomous,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+internal fun ContactsSection(
+    isContactsEnabled: Boolean,
+    permissionGranted: Boolean,
+    onToggleContacts: (Boolean) -> Unit,
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        ToggleableHeadline(
+            title = stringResource(Res.string.settings_contacts_label),
+            description = stringResource(Res.string.settings_contacts_description),
+            checked = isContactsEnabled,
+            onCheckedChange = onToggleContacts,
+        )
+
+        if (isContactsEnabled && !permissionGranted) {
             Spacer(Modifier.height(8.dp))
             PermissionRequiredRow(
-                message = stringResource(Res.string.settings_sms_send_permission_required),
+                message = stringResource(Res.string.settings_contacts_permission_required),
                 buttonLabel = stringResource(Res.string.settings_sms_permission_button),
-                onGrant = { onToggleSmsSend(true) },
+                onGrant = { onToggleContacts(true) },
             )
         }
     }

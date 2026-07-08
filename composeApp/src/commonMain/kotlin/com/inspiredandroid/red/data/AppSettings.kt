@@ -546,6 +546,18 @@ class AppSettings(internal val settings: Settings) {
         settings.putString(KEY_SMS_DRAFTS, json)
     }
 
+    fun isSmsSendAutonomous(): Boolean = settings.getBoolean(KEY_SMS_SEND_AUTONOMOUS, false)
+
+    fun setSmsSendAutonomous(autonomous: Boolean) {
+        settings.putBoolean(KEY_SMS_SEND_AUTONOMOUS, autonomous)
+    }
+
+    fun isContactsEnabled(): Boolean = settings.getBoolean(KEY_CONTACTS_ENABLED, false)
+
+    fun setContactsEnabled(enabled: Boolean) {
+        settings.putBoolean(KEY_CONTACTS_ENABLED, enabled)
+    }
+
     // Notifications (FOSS-only, Android-only — settings layer is platform-agnostic, feature
     // gate is enforced by the listener service being declared only in foss/AndroidManifest.xml)
     fun isNotificationsEnabled(): Boolean = settings.getBoolean(KEY_NOTIFICATIONS_ENABLED, false)
@@ -658,7 +670,9 @@ class AppSettings(internal val settings: Settings) {
         const val KEY_SMS_PENDING = "sms_pending"
         const val KEY_SMS_SYNC_STATE = "sms_sync_state"
         const val KEY_SMS_SEND_ENABLED = "sms_send_enabled"
+        const val KEY_SMS_SEND_AUTONOMOUS = "sms_send_autonomous"
         const val KEY_SMS_DRAFTS = "sms_drafts"
+        const val KEY_CONTACTS_ENABLED = "contacts_enabled"
 
         const val KEY_NOTIFICATIONS_ENABLED = "notifications_enabled"
         const val KEY_NOTIFICATIONS_PENDING = "notifications_pending"

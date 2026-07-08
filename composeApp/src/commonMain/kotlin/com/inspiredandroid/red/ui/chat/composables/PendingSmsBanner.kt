@@ -19,7 +19,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.key
+import kotlinx.coroutines.delay
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -83,6 +85,12 @@ private fun PendingSmsBanner(
     onSend: () -> Unit,
     onDiscard: () -> Unit,
 ) {
+    LaunchedEffect(draft.status) {
+        if (draft.status == SmsDraftStatus.SENT) {
+            delay(5000)
+            onDiscard()
+        }
+    }
     Card(
         modifier = Modifier
             .fillMaxWidth()

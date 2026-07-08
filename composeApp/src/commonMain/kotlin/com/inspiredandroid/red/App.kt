@@ -52,8 +52,10 @@ import com.inspiredandroid.red.data.AppSettings
 import com.inspiredandroid.red.data.ThemeMode
 import com.inspiredandroid.red.data.AppColorScheme
 import com.inspiredandroid.red.tools.CalendarPermissionController
+import com.inspiredandroid.red.tools.ContactsPermissionController
 import com.inspiredandroid.red.tools.NotificationPermissionController
 import com.inspiredandroid.red.tools.SetupCalendarPermissionHandler
+import com.inspiredandroid.red.tools.SetupContactsPermissionHandler
 import com.inspiredandroid.red.tools.SetupNotificationPermissionHandler
 import com.inspiredandroid.red.tools.SetupSmsPermissionHandler
 import com.inspiredandroid.red.tools.SetupSmsSendPermissionHandler
@@ -162,6 +164,9 @@ private fun AppContent(
 
     val smsSendPermissionController = koinInject<SmsSendPermissionController>()
     SetupSmsSendPermissionHandler(smsSendPermissionController)
+
+    val contactsPermissionController = koinInject<ContactsPermissionController>()
+    SetupContactsPermissionHandler(contactsPermissionController)
 
     // Set TTS voice to match system language
     @OptIn(ExperimentalVoiceApi::class)

@@ -172,10 +172,21 @@ internal fun AgentContent(uiState: SettingsUiState, actions: SettingsActions) {
                                 isRefreshing = uiState.isRefreshingSms,
                                 isSmsSendEnabled = uiState.isSmsSendEnabled,
                                 sendPermissionGranted = uiState.smsSendPermissionGranted,
+                                isSmsSendAutonomous = uiState.isSmsSendAutonomous,
                                 onToggleSms = actions.onToggleSms,
                                 onChangePollInterval = actions.onChangeSmsPollInterval,
                                 onRefresh = actions.onRefreshSms,
                                 onToggleSmsSend = actions.onToggleSmsSend,
+                                onToggleSmsSendAutonomous = actions.onToggleSmsSendAutonomous,
+                            )
+                        }
+                    }
+                    if (uiState.showContactsSection) {
+                        SettingsCard {
+                            ContactsSection(
+                                isContactsEnabled = uiState.isContactsEnabled,
+                                permissionGranted = uiState.contactsPermissionGranted,
+                                onToggleContacts = actions.onToggleContacts,
                             )
                         }
                     }
@@ -266,10 +277,21 @@ internal fun AgentContent(uiState: SettingsUiState, actions: SettingsActions) {
                             isRefreshing = uiState.isRefreshingSms,
                             isSmsSendEnabled = uiState.isSmsSendEnabled,
                             sendPermissionGranted = uiState.smsSendPermissionGranted,
+                            isSmsSendAutonomous = uiState.isSmsSendAutonomous,
                             onToggleSms = actions.onToggleSms,
                             onChangePollInterval = actions.onChangeSmsPollInterval,
                             onRefresh = actions.onRefreshSms,
                             onToggleSmsSend = actions.onToggleSmsSend,
+                            onToggleSmsSendAutonomous = actions.onToggleSmsSendAutonomous,
+                        )
+                    }
+                }
+                if (uiState.showContactsSection) {
+                    SettingsCard {
+                        ContactsSection(
+                            isContactsEnabled = uiState.isContactsEnabled,
+                            permissionGranted = uiState.contactsPermissionGranted,
+                            onToggleContacts = actions.onToggleContacts,
                         )
                     }
                 }

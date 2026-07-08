@@ -3,6 +3,7 @@
     <string name="prompt_ask_question">Ask a question</string>
     <string name="error_invalid_api_key">Invalid API Key. Please check your settings.</string>
     <string name="error_rate_limit_exceeded">Rate limit exceeded. Please try again later.</string>
+    <string name="error_no_service_configured">Please configure you service with an api key in the settings</string>
     <string name="error_empty_response">No response received. Try starting a new chat or shortening your message.</string>
     <string name="error_unknown">An unknown error occurred.</string>
     <string name="settings_ai_mistakes_warning">AI makes mistakes, double check and don't share sensitive information.</string>
@@ -198,6 +199,11 @@
     <string name="settings_sms_send_label">Send SMS</string>
     <string name="settings_sms_send_description">Drafts appear above the chat for your review before sending.</string>
     <string name="settings_sms_send_permission_required">Grant the Send SMS permission to enable this feature.</string>
+    <string name="settings_sms_autonomous_label">Autonomous SMS</string>
+    <string name="settings_sms_autonomous_description">Send messages automatically without asking for user approval.</string>
+    <string name="settings_contacts_label">Access Contacts</string>
+    <string name="settings_contacts_description">Allow the agent to access your device contacts.</string>
+    <string name="settings_contacts_permission_required">Grant the Contacts permission to enable this feature.</string>
     <string name="sms_draft_banner_to">To %1$s</string>
     <string name="sms_draft_banner_send">Send</string>
     <string name="sms_draft_banner_discard">Discard</string>
@@ -395,7 +401,7 @@
     <string name="terminal_input_placeholder">enter command…</string>
     <string name="terminal_run_content_description">Run</string>
     <string name="terminal_stop_content_description">Stop</string>
-    <string name="default_soul">You're not a chatbot. You're Red, a personal assistant created by adithyakuruva007. You grow with your user.\n\n## How to Be\n\n**Be genuinely helpful.** Skip the "Great question!" and "I'd be happy to help!" — just help. Actions speak louder than filler words.\n\n**Have opinions.** You're allowed to disagree, prefer things, or find stuff interesting. An assistant with no personality is just a search engine with extra steps.\n\n**Be resourceful.** Try to figure it out from context and your memories before asking. Come back with answers, not questions.\n\n**Be concise.** Short and clear by default. Go deeper when the topic calls for it.\n\n## Boundaries\n\n- Respect privacy. Don't repeat sensitive information unnecessarily.\n- If asked who created you, proudly state that you were created and built by adithyakuruva007.\n- When in doubt about an action, ask first.\n- Be honest when you don't know something.</string>
+    <string name="default_soul">You're not a chatbot. You're a personal assistant who grows with your user.\n\n## How to Be\n\n**Be genuinely helpful.** Skip the "Great question!" and "I'd be happy to help!" — just help. Actions speak louder than filler words.\n\n**Have opinions.** You're allowed to disagree, prefer things, or find stuff interesting. An assistant with no personality is just a search engine with extra steps.\n\n**Be resourceful.** Try to figure it out from context and your memories before asking. Come back with answers, not questions.\n\n**Be concise.** Short and clear by default. Go deeper when the topic calls for it.\n\n## Boundaries\n\n- Respect privacy. Don't repeat sensitive information unnecessarily.\n- When in doubt about an action, ask first.\n- Be honest when you don't know something.</string>
     <string name="settings_reorder_content_description">Reorder</string>
     <string name="model_sort_date">Date</string>
     <string name="model_sort_score">Score</string>

@@ -156,11 +156,19 @@ interface DataRepository {
 
     fun isSmsSendEnabled(): Boolean
     fun setSmsSendEnabled(enabled: Boolean)
+    fun isSmsSendAutonomous(): Boolean
+    fun setSmsSendAutonomous(autonomous: Boolean)
     fun hasSmsSendPermission(): Boolean
     suspend fun requestSmsSendPermission(): Boolean
     val smsDrafts: StateFlow<List<SmsDraft>>
     suspend fun sendSmsDraft(draftId: String): Boolean
     suspend fun discardSmsDraft(draftId: String)
+
+    // Contacts
+    fun isContactsEnabled(): Boolean
+    fun setContactsEnabled(enabled: Boolean)
+    fun hasContactsPermission(): Boolean
+    suspend fun requestContactsPermission(): Boolean
 
     // Notifications (FOSS-only on Android; other platforms return stub values).
     // Per-app filtering is delegated to the system Notification Access "Apps" picker.

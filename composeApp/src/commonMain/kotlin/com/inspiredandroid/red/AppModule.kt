@@ -27,6 +27,7 @@ import com.inspiredandroid.red.splinterlands.SplinterlandsApi
 import com.inspiredandroid.red.splinterlands.SplinterlandsBattleRunner
 import com.inspiredandroid.red.splinterlands.SplinterlandsStore
 import com.inspiredandroid.red.tools.CalendarPermissionController
+import com.inspiredandroid.red.tools.ContactsPermissionController
 import com.inspiredandroid.red.tools.NotificationListenerController
 import com.inspiredandroid.red.tools.NotificationPermissionController
 import com.inspiredandroid.red.tools.SmsPermissionController
@@ -43,6 +44,7 @@ import org.koin.dsl.module
 
 val appModule = module {
     single<CalendarPermissionController> { CalendarPermissionController() }
+    single<ContactsPermissionController> { ContactsPermissionController() }
     single<NotificationPermissionController> { NotificationPermissionController() }
     single<SmsPermissionController> { SmsPermissionController() }
     single<SmsSendPermissionController> { SmsSendPermissionController() }
@@ -119,6 +121,7 @@ val appModule = module {
             smsReader = get(),
             smsPermissionController = get(),
             smsSendPermissionController = get(),
+            contactsPermissionController = get(),
             smsSender = get(),
             smsDraftStore = get(),
             notificationStore = get(),

@@ -14,6 +14,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import kotlinx.coroutines.delay
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
@@ -35,6 +37,12 @@ internal fun HeartbeatBanner(
     onTap: () -> Unit,
     onDismiss: () -> Unit,
 ) {
+    LaunchedEffect(visible) {
+        if (visible) {
+            delay(5000)
+            onDismiss()
+        }
+    }
     AnimatedVisibility(
         visible = visible,
         enter = slideInVertically { -it },
