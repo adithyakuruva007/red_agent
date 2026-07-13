@@ -4,7 +4,7 @@ import com.inspiredandroid.red.data.NotificationRecord
 
 /**
  * Multiplatform notification reader. Only the Android FOSS build returns real data —
- * the feature is gated by the `KaiNotificationListenerService` being declared in the
+ * the feature is gated by the `RedNotificationListenerService` being declared in the
  * merged manifest, which is only the case for the `foss` product flavor. iOS, desktop,
  * and wasm return no-op stubs (notification access is either restricted or doesn't
  * exist on those platforms).
@@ -28,4 +28,7 @@ expect class NotificationReader() {
      * Optional [packageName] filter restricts to a single app.
      */
     suspend fun search(query: String, limit: Int, packageName: String?): List<NotificationRecord>
+
+    /** Reply to an active notification with text. Returns true if the action was sent successfully. */
+    suspend fun reply(id: String, text: String): Boolean
 }

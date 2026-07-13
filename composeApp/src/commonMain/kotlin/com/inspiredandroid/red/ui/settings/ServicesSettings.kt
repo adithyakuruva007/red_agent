@@ -72,13 +72,13 @@ import com.inspiredandroid.red.inference.LocalModel
 import com.inspiredandroid.red.inference.calculateDevicePerformance
 import com.inspiredandroid.red.inference.estimateGpuMemoryMb
 import com.inspiredandroid.red.ui.RedClearableTextField
-import com.inspiredandroid.red.ui.components.KaiSlider
+import com.inspiredandroid.red.ui.components.RedSlider
 import com.inspiredandroid.red.ui.components.VerticalScrollbarForScroll
 import com.inspiredandroid.red.ui.handCursor
 import com.inspiredandroid.red.ui.icons.DragIndicator
-import com.inspiredandroid.red.ui.kaiAdaptiveCardBorder
-import com.inspiredandroid.red.ui.kaiAdaptiveCardColors
-import com.inspiredandroid.red.ui.kaiAdaptiveCardSurface
+import com.inspiredandroid.red.ui.redAdaptiveCardBorder
+import com.inspiredandroid.red.ui.redAdaptiveCardColors
+import com.inspiredandroid.red.ui.redAdaptiveCardSurface
 import red.composeapp.generated.resources.Res
 import red.composeapp.generated.resources.ic_arrow_drop_down
 import red.composeapp.generated.resources.litert_cancel
@@ -272,7 +272,7 @@ private fun ConfiguredServiceCardContent(
 ) {
     Column(
         modifier = Modifier
-            .kaiAdaptiveCardSurface()
+            .redAdaptiveCardSurface()
             .fillMaxWidth()
             .clickable { onExpand() }
             .handCursor(),
@@ -654,7 +654,7 @@ private fun LiteRTSettings(
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                KaiSlider(
+                RedSlider(
                     value = contextSliderValue,
                     onValueChange = { contextSliderValue = it },
                     onValueChangeFinished = {

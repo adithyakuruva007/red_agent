@@ -19,13 +19,11 @@ import com.inspiredandroid.red.inference.createLocalInferenceEngine
 import com.inspiredandroid.red.mcp.McpServerManager
 import com.inspiredandroid.red.network.Requests
 import com.inspiredandroid.red.notifications.NotificationReader
+import com.inspiredandroid.red.contacts.ContactsReader
 import com.inspiredandroid.red.skills.SkillManager
 import com.inspiredandroid.red.sms.SmsPoller
 import com.inspiredandroid.red.sms.SmsReader
 import com.inspiredandroid.red.sms.SmsSender
-import com.inspiredandroid.red.splinterlands.SplinterlandsApi
-import com.inspiredandroid.red.splinterlands.SplinterlandsBattleRunner
-import com.inspiredandroid.red.splinterlands.SplinterlandsStore
 import com.inspiredandroid.red.tools.CalendarPermissionController
 import com.inspiredandroid.red.tools.ContactsPermissionController
 import com.inspiredandroid.red.tools.NotificationListenerController
@@ -38,7 +36,6 @@ import com.inspiredandroid.red.ui.sandbox.SandboxPackagesViewModel
 import com.inspiredandroid.red.ui.sandbox.SandboxSessionViewModel
 import com.inspiredandroid.red.ui.settings.SandboxViewModel
 import com.inspiredandroid.red.ui.settings.SettingsViewModel
-import com.inspiredandroid.red.ui.settings.SplinterlandsViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
@@ -52,6 +49,7 @@ val appModule = module {
     single<SmsSender> { SmsSender() }
     single<NotificationListenerController> { NotificationListenerController() }
     single<NotificationReader> { NotificationReader() }
+    single<ContactsReader> { ContactsReader() }
     single<AppSettings> {
         AppSettings(createSecureSettings()).also {
             it.runMigrations(createLegacySettings())
@@ -90,12 +88,7 @@ val appModule = module {
     single<NotificationStore> {
         NotificationStore(get())
     }
-    single<SplinterlandsStore> {
-        SplinterlandsStore(get())
-    }
-    single<SplinterlandsApi> {
-        SplinterlandsApi()
-    }
+
     single<HeartbeatManager> {
         HeartbeatManager(get(), get(), get(), get())
     }
@@ -133,9 +126,7 @@ val appModule = module {
         )
     }
     single<DataRepository> { get<RemoteDataRepository>() }
-    single<SplinterlandsBattleRunner> {
-        SplinterlandsBattleRunner(get(), get(), get<DataRepository>(), get<DaemonController>())
-    }
+
     single<TaskScheduler> {
         TaskScheduler(
             get<DataRepository>(),
@@ -156,6 +147,6 @@ val appModule = module {
     viewModel { SandboxFileBrowserViewModel(get<SandboxController>()) }
     viewModel { SandboxPackagesViewModel(get<SandboxController>()) }
     viewModel { SandboxSessionViewModel(get<SandboxController>(), get<DataRepository>()) }
-    viewModel { SplinterlandsViewModel(get<DataRepository>(), get(), get(), get<SplinterlandsApi>()) }
+
     viewModel { ChatViewModel(get<DataRepository>(), get<TaskScheduler>()) }
 }

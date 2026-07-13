@@ -83,8 +83,8 @@ import com.inspiredandroid.red.data.imageExtensions
 import com.inspiredandroid.red.skills.SkillManifest
 import com.inspiredandroid.red.ui.rememberGradientBrush
 import com.inspiredandroid.red.ui.handCursor
-import com.inspiredandroid.red.ui.kaiInputSurface
-import com.inspiredandroid.red.ui.kaiIconButtonSurface
+import com.inspiredandroid.red.ui.redInputSurface
+import com.inspiredandroid.red.ui.redIconButtonSurface
 import com.inspiredandroid.red.data.AppSettings
 import com.inspiredandroid.red.data.AppColorScheme
 import org.koin.compose.koinInject
@@ -205,7 +205,7 @@ fun QuestionInput(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 12.dp, end = 12.dp, top = 2.dp, bottom = 4.dp)
-                .kaiInputSurface(isFocused = isFocused, shape = RoundedCornerShape(6.dp))
+                .redInputSurface(isFocused = isFocused, shape = RoundedCornerShape(6.dp))
         ) {
             // Prompt input text field (transparent)
             TextField(
@@ -533,7 +533,7 @@ internal fun CircleIconButton(
     Box(
         modifier = modifier
             .size(42.dp)
-            .kaiIconButtonSurface(shape = RoundedCornerShape(8.dp))
+            .redIconButtonSurface(shape = RoundedCornerShape(8.dp))
             .clickable { onClick() }
             .handCursor(),
         contentAlignment = Alignment.Center,

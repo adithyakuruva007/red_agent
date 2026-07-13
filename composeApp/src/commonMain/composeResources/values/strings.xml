@@ -120,6 +120,10 @@
     <string name="tool_read_notification_description">Read the full body of a notification</string>
     <string name="tool_search_notifications_name">Search Notifications</string>
     <string name="tool_search_notifications_description">Search notifications by app or text</string>
+    <string name="tool_reply_notification_name">Reply to Notification</string>
+    <string name="tool_reply_notification_description">Reply to an active notification (e.g. WhatsApp, Telegram)</string>
+    <string name="tool_search_contacts_name">Search Contacts</string>
+    <string name="tool_search_contacts_description">Search phone contacts by name</string>
     <string name="settings_notifications_label">Read notifications</string>
     <string name="settings_notifications_description">Incoming notifications are picked up by the heartbeat. Pick which apps Red can read in system Notification access settings.</string>
     <string name="settings_notifications_access_required">Notification access has not been granted. Tap below to enable Red under system settings.</string>
@@ -389,8 +393,8 @@
     <string name="sandbox_files_editor_open_in_app">Open in app</string>
     <string name="sandbox_files_editor_force_open_as_text">Force open as text</string>
     <string name="sandbox_files_editor_save">Save</string>
-    <string name="kai_ui_render_failed">Failed to render UI</string>
-    <string name="kai_ui_code_copy">Copy</string>
+    <string name="red_ui_render_failed">Failed to render UI</string>
+    <string name="red_ui_code_copy">Copy</string>
     <string name="image_viewer_close">Close</string>
     <string name="settings_sandbox_uninstall">Uninstall</string>
     <string name="settings_sandbox_uninstall_confirm">All data in the Linux sandbox will be lost. Are you sure you want to uninstall?</string>

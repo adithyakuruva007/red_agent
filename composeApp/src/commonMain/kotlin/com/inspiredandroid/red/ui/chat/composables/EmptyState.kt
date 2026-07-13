@@ -59,7 +59,7 @@ internal fun EmptyState(
             val annotatedString = remember(prefixText, policyText, linkColor) {
                 buildAnnotatedString {
                     append(prefixText)
-                    withLink(LinkAnnotation.Url(url = "https://schubert-simon.de/privacy/red.txt")) {
+                    withLink(LinkAnnotation.Url(url = "https://raw.githubusercontent.com/adithyakuruva007/red_agent/main/PRIVACY.md")) {
                         withStyle(style = SpanStyle(color = linkColor)) {
                             append(policyText)
                         }

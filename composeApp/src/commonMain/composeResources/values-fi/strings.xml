@@ -366,8 +366,8 @@ Jos jokin vaatii huomiota (vanhentuneet muistot, erääntyneet tehtävät, käyt
     <string name="sandbox_files_editor_open_in_app">Avaa sovelluksessa</string>
     <string name="sandbox_files_editor_force_open_as_text">Pakota avaaminen tekstinä</string>
     <string name="sandbox_files_editor_save">Tallenna</string>
-    <string name="kai_ui_render_failed">Käyttöliittymän renderöinti epäonnistui</string>
-    <string name="kai_ui_code_copy">Kopioi</string>
+    <string name="red_ui_render_failed">Käyttöliittymän renderöinti epäonnistui</string>
+    <string name="red_ui_code_copy">Kopioi</string>
     <string name="image_viewer_close">Sulje</string>
     <string name="bot_message_thinking_label">Ajattelee</string>
     <string name="bot_message_thinking_expand_content_description">Laajenna tai supista ajattelu</string>

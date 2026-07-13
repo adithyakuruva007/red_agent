@@ -29,7 +29,7 @@ import com.inspiredandroid.red.data.AppColorScheme
 import org.koin.compose.koinInject
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.inspiredandroid.red.ui.RedOutlinedTextField
-import com.inspiredandroid.red.ui.components.KaiSlider
+import com.inspiredandroid.red.ui.components.RedSlider
 import com.inspiredandroid.red.ui.handCursor
 import red.composeapp.generated.resources.Res
 import red.composeapp.generated.resources.ic_arrow_drop_down
@@ -206,7 +206,7 @@ private fun UiScaleSection(
                 color = MaterialTheme.colorScheme.onBackground,
             )
         }
-        KaiSlider(
+        RedSlider(
             value = sliderValue,
             onValueChange = { sliderValue = it },
             onValueChangeFinished = { onChangeUiScale(sliderValue) },
@@ -222,7 +222,6 @@ private fun ColorSchemePicker(
     onChangeColorScheme: (AppColorScheme) -> Unit,
 ) {
     val options = listOf(
-        AppColorScheme.AdwaitaRedBlack to "Adwaita Red (Black)",
         AppColorScheme.AdwaitaBlack to "Adwaita Black",
         AppColorScheme.AdwaitaBlackLightBlue to "Adwaita Black (Light Blue)",
         AppColorScheme.Claymorphism to "Claymorphism (Dark Adwaita)",

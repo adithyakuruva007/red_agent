@@ -27,6 +27,8 @@ import com.inspiredandroid.red.network.tools.ToolInfo
 import com.inspiredandroid.red.network.tools.ToolSchema
 import com.inspiredandroid.red.network.tools.ParameterSchema
 import com.inspiredandroid.red.tools.CommonTools
+import com.inspiredandroid.red.tools.ContactsTools
+import com.inspiredandroid.red.contacts.ContactsReader
 import com.inspiredandroid.red.tools.EmailTools
 import com.inspiredandroid.red.tools.HeartbeatTools
 import com.inspiredandroid.red.tools.ProcessManagerTool
@@ -103,8 +105,6 @@ actual val isSmsSupported: Boolean = false
 
 actual val isNotificationsSupported: Boolean = false
 
-actual val isSplinterlandsSupported: Boolean = true
-
 actual suspend fun compressImageBytes(bytes: ByteArray, mimeType: String): ByteArray {
     if (!mimeType.startsWith("image/")) return bytes
     return try {
@@ -150,7 +150,7 @@ actual fun createSecureSettings(): Settings = EncryptedFileSettings()
 
 actual fun createLegacySettings(): Settings? = null // Same storage location, no migration needed
 
-actual fun getPlatformToolDefinitions(): List<ToolInfo> = listOf(ShellCommandTool.toolInfo, ProcessManagerTool.toolInfo) + CommonTools.commonToolDefinitions + WebBrowserTools.browserToolDefinitions
+actual fun getPlatformToolDefinitions(): List<ToolInfo> = listOf(ShellCommandTool.toolInfo, ProcessManagerTool.toolInfo) + CommonTools.commonToolDefinitions + WebBrowserTools.browserToolDefinitions + ContactsTools.contactsToolDefinitions
 
 actual fun getAvailableTools(): List<Tool> {
     val appSettings: AppSettings by inject(AppSettings::class.java)
@@ -195,6 +195,13 @@ actual fun getAvailableTools(): List<Tool> {
         }
         if (appSettings.isToolEnabled(WebBrowserTools.browserScreenshotTool.schema.name)) {
             add(WebBrowserTools.browserScreenshotTool)
+        }
+
+        if (appSettings.isContactsEnabled()) {
+            val contactsReader: ContactsReader by inject(ContactsReader::class.java)
+            if (contactsReader.hasPermission()) {
+                addAll(ContactsTools.getContactsTools(contactsReader))
+            }
         }
 
         val mcpServerManager: McpServerManager by inject(McpServerManager::class.java)

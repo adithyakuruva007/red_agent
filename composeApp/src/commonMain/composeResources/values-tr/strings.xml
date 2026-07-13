@@ -365,8 +365,8 @@ Bir şey dikkat gerektiriyorsa (eski anılar, vadesi geçmiş görevler, kullan�
     <string name="sandbox_files_editor_open_in_app">Uygulamada aç</string>
     <string name="sandbox_files_editor_force_open_as_text">Metin olarak açmaya zorla</string>
     <string name="sandbox_files_editor_save">Kaydet</string>
-    <string name="kai_ui_render_failed">Arayüz oluşturulamadı</string>
-    <string name="kai_ui_code_copy">Kopyala</string>
+    <string name="red_ui_render_failed">Arayüz oluşturulamadı</string>
+    <string name="red_ui_code_copy">Kopyala</string>
     <string name="image_viewer_close">Kapat</string>
     <string name="bot_message_thinking_label">Düşünme</string>
     <string name="bot_message_thinking_expand_content_description">Düşünmeyi genişlet veya daralt</string>

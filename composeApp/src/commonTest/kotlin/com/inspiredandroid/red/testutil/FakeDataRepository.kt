@@ -551,6 +551,11 @@ class FakeDataRepository : DataRepository {
     override fun setSmsSendEnabled(enabled: Boolean) {
         smsSendEnabled = enabled
     }
+    private var smsSendAutonomous = false
+    override fun isSmsSendAutonomous(): Boolean = smsSendAutonomous
+    override fun setSmsSendAutonomous(autonomous: Boolean) {
+        smsSendAutonomous = autonomous
+    }
     override fun hasSmsSendPermission(): Boolean = smsSendPermissionGranted
     override suspend fun requestSmsSendPermission(): Boolean {
         smsSendPermissionGranted = true
@@ -560,6 +565,18 @@ class FakeDataRepository : DataRepository {
     override suspend fun sendSmsDraft(draftId: String): Boolean = true
     override suspend fun discardSmsDraft(draftId: String) {
         _smsDrafts.value = _smsDrafts.value.filterNot { it.id == draftId }
+    }
+
+    private var contactsEnabled = false
+    private var contactsPermissionGranted = false
+    override fun isContactsEnabled(): Boolean = contactsEnabled
+    override fun setContactsEnabled(enabled: Boolean) {
+        contactsEnabled = enabled
+    }
+    override fun hasContactsPermission(): Boolean = contactsPermissionGranted
+    override suspend fun requestContactsPermission(): Boolean {
+        contactsPermissionGranted = true
+        return true
     }
 
     private var notificationsEnabled = false

@@ -14,6 +14,8 @@ import red.composeapp.generated.resources.tool_read_notification_description
 import red.composeapp.generated.resources.tool_read_notification_name
 import red.composeapp.generated.resources.tool_search_notifications_description
 import red.composeapp.generated.resources.tool_search_notifications_name
+import red.composeapp.generated.resources.tool_reply_notification_description
+import red.composeapp.generated.resources.tool_reply_notification_name
 
 object NotificationTools {
 
@@ -135,6 +137,45 @@ object NotificationTools {
         }
     }
 
+    fun replyNotificationTool(reader: NotificationReader) = object : Tool {
+        override val schema = ToolSchema(
+            name = "reply_notification",
+            description = "Reply to an active notification (e.g. WhatsApp, Telegram) with text. " +
+                "Use check_notifications or search_notifications first to find the target notification's id.",
+            parameters = mapOf(
+                "id" to ParameterSchema(
+                    type = "string",
+                    description = "The notification id returned by check_notifications or search_notifications",
+                    required = true,
+                ),
+                "text" to ParameterSchema(
+                    type = "string",
+                    description = "The reply text message content to send",
+                    required = true,
+                ),
+            ),
+        )
+
+        override suspend fun execute(args: Map<String, Any>): Any {
+            if (!reader.isSupported()) {
+                return mapOf("success" to false, "error" to "Notification reading is not available on this build")
+            }
+            if (!reader.hasAccess()) {
+                return mapOf("success" to false, "error" to "Notification access not granted")
+            }
+            val id = args["id"]?.toString()
+                ?: return mapOf("success" to false, "error" to "Missing id")
+            val text = args["text"]?.toString()
+                ?: return mapOf("success" to false, "error" to "Missing text")
+            val success = reader.reply(id, text)
+            return mapOf(
+                "success" to success,
+                "id" to id,
+                "message" to if (success) "Reply sent successfully" else "Failed to send reply (maybe notification is no longer active or app doesn't support replies)"
+            )
+        }
+    }
+
     val checkNotificationsToolInfo = ToolInfo(
         id = "check_notifications",
         name = "Check Notifications",
@@ -159,16 +200,26 @@ object NotificationTools {
         descriptionRes = Res.string.tool_search_notifications_description,
     )
 
+    val replyNotificationToolInfo = ToolInfo(
+        id = "reply_notification",
+        name = "Reply to Notification",
+        description = "Reply to an active notification",
+        nameRes = Res.string.tool_reply_notification_name,
+        descriptionRes = Res.string.tool_reply_notification_description,
+    )
+
     val notificationToolDefinitions = listOf(
         checkNotificationsToolInfo,
         readNotificationToolInfo,
         searchNotificationsToolInfo,
+        replyNotificationToolInfo,
     )
 
     fun getNotificationTools(store: NotificationStore, reader: NotificationReader): List<Tool> = listOf(
         checkNotificationsTool(store, reader),
         readNotificationTool(reader),
         searchNotificationsTool(reader),
+        replyNotificationTool(reader),
     )
 
     private const val SEARCH_LIMIT = 20

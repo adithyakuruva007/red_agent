@@ -53,8 +53,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.inspiredandroid.red.SandboxFileEntry
 import com.inspiredandroid.red.formatFileSize
 import com.inspiredandroid.red.ui.handCursor
-import com.inspiredandroid.red.ui.kaiAdaptiveCardBorder
-import com.inspiredandroid.red.ui.kaiAdaptiveCardColors
+import com.inspiredandroid.red.ui.redAdaptiveCardBorder
+import com.inspiredandroid.red.ui.redAdaptiveCardColors
 import red.composeapp.generated.resources.Res
 import red.composeapp.generated.resources.sandbox_files_action_delete
 import red.composeapp.generated.resources.sandbox_files_action_more
@@ -282,8 +282,8 @@ private fun FileRow(
     onDelete: () -> Unit,
 ) {
     Card(
-        colors = kaiAdaptiveCardColors(),
-        border = kaiAdaptiveCardBorder(),
+        colors = redAdaptiveCardColors(),
+        border = redAdaptiveCardBorder(),
         modifier = Modifier.fillMaxWidth(),
     ) {
         Row(

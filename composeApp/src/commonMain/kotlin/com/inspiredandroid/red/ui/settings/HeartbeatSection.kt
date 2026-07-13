@@ -43,8 +43,8 @@ import com.inspiredandroid.red.data.HeartbeatLogEntry
 import com.inspiredandroid.red.data.ServiceEntry
 import com.inspiredandroid.red.data.SmsSyncState
 import com.inspiredandroid.red.ui.RedOutlinedTextField
-import com.inspiredandroid.red.ui.components.KaiRangeSlider
-import com.inspiredandroid.red.ui.components.KaiSlider
+import com.inspiredandroid.red.ui.components.RedRangeSlider
+import com.inspiredandroid.red.ui.components.RedSlider
 import com.inspiredandroid.red.ui.components.RefreshIconButton
 import com.inspiredandroid.red.ui.components.SettingsListItem
 import com.inspiredandroid.red.ui.handCursor
@@ -196,7 +196,7 @@ internal fun HeartbeatSection(
                     color = MaterialTheme.colorScheme.onBackground,
                 )
             }
-            KaiRangeSlider(
+            RedRangeSlider(
                 value = activeStart..activeEnd,
                 onValueChange = { range ->
                     activeStart = range.start
@@ -880,7 +880,7 @@ private fun PresetSlider(
             color = MaterialTheme.colorScheme.onBackground,
         )
     }
-    KaiSlider(
+    RedSlider(
         value = sliderValue,
         onValueChange = { sliderValue = it },
         onValueChangeFinished = {

@@ -45,6 +45,7 @@ class RedNotificationListenerService : NotificationListenerService() {
 
     override fun onListenerConnected() {
         super.onListenerConnected()
+        activeInstance = this
         scope.launch {
             store.updateSyncState(
                 NotificationSyncState(
@@ -58,6 +59,9 @@ class RedNotificationListenerService : NotificationListenerService() {
 
     override fun onListenerDisconnected() {
         super.onListenerDisconnected()
+        if (activeInstance == this) {
+            activeInstance = null
+        }
         scope.launch {
             store.updateSyncState(
                 store.getSyncState().copy(listenerBound = false),
@@ -67,6 +71,9 @@ class RedNotificationListenerService : NotificationListenerService() {
 
     override fun onDestroy() {
         super.onDestroy()
+        if (activeInstance == this) {
+            activeInstance = null
+        }
         scope.cancel()
     }
 
@@ -121,6 +128,11 @@ class RedNotificationListenerService : NotificationListenerService() {
     }
 
     companion object {
+        @Volatile
+        private var activeInstance: RedNotificationListenerService? = null
+
+        fun getActiveInstance(): RedNotificationListenerService? = activeInstance
+
         private val HARD_BLOCKED_PACKAGES = setOf(
             "android",
             "com.android.systemui",

@@ -55,7 +55,7 @@ val ColorScheme.isOledFlavor: Boolean get() = background == Color.Black
 val ColorScheme.isClaymorphism: Boolean get() = background == Color(0xFF1A1A24)
 
 @Composable
-fun kaiAdaptiveCardColors(): CardColors {
+fun redAdaptiveCardColors(): CardColors {
     val scheme = MaterialTheme.colorScheme
     return CardDefaults.cardColors(
         containerColor = when {
@@ -67,7 +67,7 @@ fun kaiAdaptiveCardColors(): CardColors {
 }
 
 @Composable
-fun kaiAdaptiveCardBorder(): BorderStroke? {
+fun redAdaptiveCardBorder(): BorderStroke? {
     val scheme = MaterialTheme.colorScheme
     return when {
         scheme.isOledFlavor -> BorderStroke(1.dp, scheme.outlineVariant)
@@ -77,7 +77,7 @@ fun kaiAdaptiveCardBorder(): BorderStroke? {
 }
 
 @Composable
-fun Modifier.kaiAdaptiveCardSurface(shape: Shape = CardDefaults.shape): Modifier {
+fun Modifier.redAdaptiveCardSurface(shape: Shape = CardDefaults.shape): Modifier {
     val scheme = MaterialTheme.colorScheme
     val finalShape = if (scheme.isClaymorphism) RoundedCornerShape(24.dp) else shape
     return this
@@ -99,7 +99,7 @@ fun Modifier.kaiAdaptiveCardSurface(shape: Shape = CardDefaults.shape): Modifier
 }
 
 @Composable
-fun Modifier.kaiInputSurface(isFocused: Boolean, shape: Shape = RoundedCornerShape(12.dp)): Modifier {
+fun Modifier.redInputSurface(isFocused: Boolean, shape: Shape = RoundedCornerShape(12.dp)): Modifier {
     val scheme = MaterialTheme.colorScheme
     val finalBg = when {
         scheme.isOledFlavor -> Color.Transparent
@@ -119,7 +119,7 @@ fun Modifier.kaiInputSurface(isFocused: Boolean, shape: Shape = RoundedCornerSha
 }
 
 @Composable
-fun Modifier.kaiIconButtonSurface(shape: Shape = RoundedCornerShape(8.dp)): Modifier {
+fun Modifier.redIconButtonSurface(shape: Shape = RoundedCornerShape(8.dp)): Modifier {
     val scheme = MaterialTheme.colorScheme
     val finalBg = when {
         scheme.isOledFlavor -> Color.Transparent
@@ -245,24 +245,7 @@ fun Theme(
     }
 }
 
-val DarkAdwaitaRedBlackColorScheme = darkColorScheme(
-    primary = Color(0xFFF66151), // Adwaita Red Light
-    onPrimary = Color(0xFFFFFFFF),
-    primaryContainer = Color(0xFFE0E0E0), // fallback, but we use red
-    onPrimaryContainer = Color(0xFFFFFFFF),
-    secondary = Color(0xFFB0B0B0),
-    onSecondary = Color(0xFF212121),
-    secondaryContainer = Color(0xFF242424),
-    onSecondaryContainer = Color(0xFFEEEEEE),
-    surface = Color(0xFF101010),
-    background = Color(0xFF000000), // Pure black
-    onBackground = Color(0xFFFFFFFF),
-    onSurface = Color(0xFFFFFFFF),
-    surfaceVariant = Color(0xFF242424),
-    onSurfaceVariant = Color(0xFFCCCCCC),
-    outline = Color(0xFF555555),
-    outlineVariant = Color(0xFF303030),
-)
+
 
 val DarkAdwaitaBlackColorScheme = darkColorScheme(
     primary = Color(0xFF3584E4),
@@ -348,9 +331,6 @@ fun rememberGradientBrush(): Brush {
     val colorSchemeType by appSettings.colorSchemeFlow.collectAsStateWithLifecycle()
     return remember(colorSchemeType) {
         when (colorSchemeType) {
-            AppColorScheme.AdwaitaRedBlack -> {
-                Brush.horizontalGradient(listOf(Color(0xFFF66151), Color(0xFFE01B24)))
-            }
             AppColorScheme.AdwaitaBlack -> {
                 Brush.horizontalGradient(listOf(Color(0xFF3584E4), Color(0xFF1C71D8)))
             }

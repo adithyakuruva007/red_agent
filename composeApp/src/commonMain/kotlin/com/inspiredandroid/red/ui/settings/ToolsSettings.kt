@@ -27,8 +27,8 @@ import com.inspiredandroid.red.network.tools.ToolInfo
 import com.inspiredandroid.red.skills.RegistrySkillEntry
 import com.inspiredandroid.red.skills.SkillManifest
 import com.inspiredandroid.red.ui.handCursor
-import com.inspiredandroid.red.ui.kaiAdaptiveCardBorder
-import com.inspiredandroid.red.ui.kaiAdaptiveCardColors
+import com.inspiredandroid.red.ui.redAdaptiveCardBorder
+import com.inspiredandroid.red.ui.redAdaptiveCardColors
 import red.composeapp.generated.resources.Res
 import red.composeapp.generated.resources.settings_tools_description
 import red.composeapp.generated.resources.settings_tools_none_available
@@ -157,8 +157,8 @@ private fun ToolItem(
             .clip(CardDefaults.shape)
             .clickable { onToggle(!tool.isEnabled) }
             .handCursor(),
-        colors = kaiAdaptiveCardColors(),
-        border = kaiAdaptiveCardBorder(),
+        colors = redAdaptiveCardColors(),
+        border = redAdaptiveCardBorder(),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(16.dp),

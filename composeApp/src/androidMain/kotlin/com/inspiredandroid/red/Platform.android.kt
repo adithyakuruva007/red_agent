@@ -46,6 +46,8 @@ import com.inspiredandroid.red.tools.NotificationHelper
 import com.inspiredandroid.red.tools.NotificationPermissionController
 import com.inspiredandroid.red.tools.NotificationResult
 import com.inspiredandroid.red.tools.NotificationTools
+import com.inspiredandroid.red.tools.ContactsTools
+import com.inspiredandroid.red.contacts.ContactsReader
 import com.inspiredandroid.red.tools.OpenFileTool
 import com.inspiredandroid.red.tools.ProcessManagerTool
 import com.inspiredandroid.red.tools.SchedulingTools
@@ -121,8 +123,6 @@ actual val isNotificationsSupported: Boolean by lazy {
         false
     }
 }
-
-actual val isSplinterlandsSupported: Boolean = true
 
 actual suspend fun compressImageBytes(bytes: ByteArray, mimeType: String): ByteArray {
     if (!mimeType.startsWith("image/")) return bytes
@@ -233,6 +233,7 @@ actual fun getPlatformToolDefinitions(): List<ToolInfo> = buildList {
         ),
     )
     addAll(WebBrowserTools.browserToolDefinitions)
+    addAll(ContactsTools.contactsToolDefinitions)
     // SMS tools are intentionally absent here: availability is driven by the Agent-tab
     // master toggles (isSmsEnabled / isSmsSendEnabled) plus the FOSS-only `isSmsSupported`
     // check in `getAvailableTools()`. Listing per-tool toggles in the Tools tab was dead
@@ -508,6 +509,13 @@ actual fun getAvailableTools(): List<Tool> {
             if (notificationReader.hasAccess()) {
                 val notificationStore: NotificationStore by inject(NotificationStore::class.java)
                 addAll(NotificationTools.getNotificationTools(notificationStore, notificationReader))
+            }
+        }
+
+        if (appSettings.isContactsEnabled()) {
+            val contactsReader: ContactsReader by inject(ContactsReader::class.java)
+            if (contactsReader.hasPermission()) {
+                addAll(ContactsTools.getContactsTools(contactsReader))
             }
         }
 

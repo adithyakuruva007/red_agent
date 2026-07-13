@@ -47,8 +47,8 @@ import com.inspiredandroid.red.mcp.popularMcpServers
 import com.inspiredandroid.red.ui.RedOutlinedTextField
 import com.inspiredandroid.red.ui.components.VerticalScrollbarForScroll
 import com.inspiredandroid.red.ui.handCursor
-import com.inspiredandroid.red.ui.kaiAdaptiveCardBorder
-import com.inspiredandroid.red.ui.kaiAdaptiveCardColors
+import com.inspiredandroid.red.ui.redAdaptiveCardBorder
+import com.inspiredandroid.red.ui.redAdaptiveCardColors
 import red.composeapp.generated.resources.Res
 import red.composeapp.generated.resources.ic_arrow_drop_down
 import red.composeapp.generated.resources.settings_mcp_add
@@ -139,8 +139,8 @@ private fun McpServerCard(
     Card(
         onClick = { expanded = !expanded },
         modifier = Modifier.fillMaxWidth().handCursor(),
-        colors = kaiAdaptiveCardColors(),
-        border = kaiAdaptiveCardBorder(),
+        colors = redAdaptiveCardColors(),
+        border = redAdaptiveCardBorder(),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(

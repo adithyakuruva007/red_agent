@@ -1,8 +1,11 @@
 package com.inspiredandroid.red.notifications
 
 import android.app.NotificationManager
+import android.app.RemoteInput
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Bundle
 import com.inspiredandroid.red.data.NotificationRecord
 import com.inspiredandroid.red.data.NotificationStore
 import org.koin.java.KoinJavaComponent.inject
@@ -61,5 +64,31 @@ actual class NotificationReader actual constructor() {
             .sortedByDescending { it.postedAtEpochMs }
             .take(limit)
             .toList()
+    }
+
+    actual suspend fun reply(id: String, text: String): Boolean {
+        if (!hasAccess()) return false
+        val service = RedNotificationListenerService.getActiveInstance() ?: return false
+        val activeNotifications = try {
+            service.activeNotifications
+        } catch (e: Exception) {
+            return false
+        }
+        val sbn = activeNotifications.firstOrNull { it.key == id } ?: return false
+        val notification = sbn.notification ?: return false
+        val action = notification.actions?.firstOrNull { act ->
+            act.remoteInputs?.any { it.resultKey != null } == true
+        } ?: return false
+        val remoteInput = action.remoteInputs.first { it.resultKey != null }
+        val bundle = Bundle()
+        bundle.putCharSequence(remoteInput.resultKey, text)
+        val intent = Intent()
+        RemoteInput.addResultsToIntent(action.remoteInputs, intent, bundle)
+        return try {
+            action.actionIntent.send(context, 0, intent)
+            true
+        } catch (e: Exception) {
+            false
+        }
     }
 }

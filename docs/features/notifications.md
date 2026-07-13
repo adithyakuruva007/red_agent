@@ -31,7 +31,7 @@ Notification access is granted via system settings, not a runtime permission dia
 1. In **Settings → Agent → Notifications → "Read notifications"**, the user flips the toggle on.
 2. The app deep-links to **Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS** (or the per-component variant on API 30+) and instructs the user to enable Red in the list.
 3. On return, the app polls `NotificationManager.isNotificationListenerAccessGranted(…)` (API 27+) or `Settings.Secure.getString("enabled_notification_listeners")`. If granted, the toggle stays on; if not, the toggle resets and an inline hint appears.
-4. Once granted, Android binds `KaiNotificationListenerService`. From then on every `onNotificationPosted` callback that passes the visibility filters writes a record into the pending queue. The user can refine *which* apps Red sees from the same system Notification Access screen — the "Apps" picker per listener is the source of truth.
+4. Once granted, Android binds `RedNotificationListenerService`. From then on every `onNotificationPosted` callback that passes the visibility filters writes a record into the pending queue. The user can refine *which* apps Red sees from the same system Notification Access screen — the "Apps" picker per listener is the source of truth.
 5. On the next heartbeat, the queue snapshot is included in the prompt under `## New Notifications`. After the heartbeat run, exactly that snapshot is removed from the queue — notifications that arrived during the call survive to the next heartbeat.
 
 If the user later revokes notification access from system settings, `onListenerDisconnected` fires, the support check flips to false, and the read tools stop appearing in the AI's available-tools list until access is re-granted.
@@ -120,12 +120,12 @@ There is **no poll interval slider** — the listener is push-driven.
 
 | File | Purpose |
 |---|---|
-| `androidApp/src/foss/AndroidManifest.xml` | Declares `BIND_NOTIFICATION_LISTENER_SERVICE` and registers `KaiNotificationListenerService` in the FOSS flavor only |
+| `androidApp/src/foss/AndroidManifest.xml` | Declares `BIND_NOTIFICATION_LISTENER_SERVICE` and registers `RedNotificationListenerService` in the FOSS flavor only |
 | `composeApp/src/commonMain/.../data/NotificationModels.kt` | `NotificationRecord`, `NotificationSyncState` data classes |
 | `composeApp/src/commonMain/.../data/NotificationStore.kt` | Pending queue + broader store + retention sweeps |
 | `composeApp/src/commonMain/.../notifications/NotificationReader.kt` | Expect interface for `getById`, `search`, `currentRecords` |
 | `composeApp/src/androidMain/.../notifications/NotificationReader.android.kt` | Reads from the in-memory + persisted listener store |
-| `composeApp/src/androidMain/.../notifications/KaiNotificationListenerService.kt` | `NotificationListenerService` subclass; visibility/hard-block filter + write to `NotificationStore` |
+| `composeApp/src/androidMain/.../notifications/RedNotificationListenerService.kt` | `NotificationListenerService` subclass; visibility/hard-block filter + write to `NotificationStore` |
 | `composeApp/src/commonMain/.../tools/NotificationTools.kt` | `check_notifications`, `read_notification`, `search_notifications` tool definitions |
 | `composeApp/src/commonMain/.../tools/NotificationListenerController.kt` | Expect interface for "is access granted" + "open settings" |
 | `composeApp/src/androidMain/.../tools/NotificationListenerController.android.kt` | `NotificationManager.isNotificationListenerAccessGranted` + `Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS` deep-link |

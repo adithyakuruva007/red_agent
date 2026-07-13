@@ -365,8 +365,8 @@ Hvis noe trenger oppmerksomhet (utdaterte minner, forfalte oppgaver, brukeroppf�
     <string name="sandbox_files_editor_open_in_app">Åpne i app</string>
     <string name="sandbox_files_editor_force_open_as_text">Tving åpning som tekst</string>
     <string name="sandbox_files_editor_save">Lagre</string>
-    <string name="kai_ui_render_failed">Kunne ikke vise grensesnittet</string>
-    <string name="kai_ui_code_copy">Kopier</string>
+    <string name="red_ui_render_failed">Kunne ikke vise grensesnittet</string>
+    <string name="red_ui_code_copy">Kopier</string>
     <string name="image_viewer_close">Lukk</string>
     <string name="bot_message_thinking_label">Tenker</string>
     <string name="bot_message_thinking_expand_content_description">Utvid eller skjul tankegang</string>

@@ -1927,7 +1927,7 @@ class RemoteDataRepository(
         appSettings.setSchedulingEnabled(enabled)
     }
 
-    override fun getScheduledTasks(): List<ScheduledTask> = taskStore.getAllTasks()
+    override fun getScheduledTasks(): List<ScheduledTask> = taskStore.getAllTasks().filter { it.status == TaskStatus.PENDING }
 
     override suspend fun cancelScheduledTask(id: String) {
         taskStore.removeTask(id)

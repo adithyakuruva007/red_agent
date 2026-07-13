@@ -7,4 +7,5 @@ actual class NotificationReader actual constructor() {
     actual fun hasAccess(): Boolean = false
     actual suspend fun getById(id: String): NotificationRecord? = null
     actual suspend fun search(query: String, limit: Int, packageName: String?): List<NotificationRecord> = emptyList()
+    actual suspend fun reply(id: String, text: String): Boolean = false
 }

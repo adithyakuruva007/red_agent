@@ -234,6 +234,7 @@ class ChatSystemPromptBuilderTest {
         )
         val expected = "You're a personal assistant.\n\n" +
             DEFAULT_HONESTY_RULE + "\n\n" +
+            DEFAULT_CREATOR_RULE + "\n\n" +
             DEFAULT_ACTING_SECTION + "\n\n" +
             "## Context\n" +
             "- Local time: 2026-04-11T02:00:00+02:00 (Europe/Berlin)\n" +
@@ -586,6 +587,7 @@ class ChatSystemPromptBuilderTest {
         )
         val expected = "You are Red, a helpful assistant.\n\n" +
             DEFAULT_HONESTY_RULE + "\n\n" +
+            DEFAULT_CREATOR_RULE + "\n\n" +
             DEFAULT_TOOL_USE_SECTION + "\n\n" +
             DEFAULT_ACTING_SECTION + "\n\n" +
             "Save user preferences with memory_store.\n\n" +

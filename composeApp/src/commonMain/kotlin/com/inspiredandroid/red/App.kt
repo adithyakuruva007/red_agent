@@ -62,7 +62,6 @@ import com.inspiredandroid.red.tools.SetupSmsSendPermissionHandler
 import com.inspiredandroid.red.tools.SmsPermissionController
 import com.inspiredandroid.red.tools.SmsSendPermissionController
 import com.inspiredandroid.red.ui.DarkClaymorphismColorScheme
-import com.inspiredandroid.red.ui.DarkAdwaitaRedBlackColorScheme
 import com.inspiredandroid.red.ui.DarkAdwaitaBlackColorScheme
 import com.inspiredandroid.red.ui.DarkAdwaitaBlackLightBlueColorScheme
 import com.inspiredandroid.red.ui.LightAdwaitaColorScheme
@@ -189,7 +188,6 @@ private fun AppContent(
     val colorSchemeType by appSettings.colorSchemeFlow.collectAsStateWithLifecycle()
 
     val effectiveColorScheme = when (colorSchemeType) {
-        AppColorScheme.AdwaitaRedBlack -> DarkAdwaitaRedBlackColorScheme
         AppColorScheme.AdwaitaBlack -> DarkAdwaitaBlackColorScheme
         AppColorScheme.AdwaitaBlackLightBlue -> DarkAdwaitaBlackLightBlueColorScheme
         AppColorScheme.Claymorphism -> DarkClaymorphismColorScheme

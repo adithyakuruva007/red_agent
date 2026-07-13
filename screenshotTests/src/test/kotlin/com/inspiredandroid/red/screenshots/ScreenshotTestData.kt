@@ -158,7 +158,7 @@ object ScreenshotTestData {
         memories = persistentListOf(
             MemoryEntry(
                 key = "user_name",
-                content = "The user's name is Simon",
+                content = "The user's name is John",
                 createdAt = 1709300000000,
                 updatedAt = 1709300000000,
             ),

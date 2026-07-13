@@ -37,7 +37,7 @@ val MODEL_CATALOG = listOf(
     ),
 )
 
-private val THINK_BLOCK_REGEX = Regex("<think>.*?</think>", RegexOption.DOT_MATCHES_ALL)
+private val THINK_BLOCK_REGEX = Regex("(?s)<think>.*?</think>")
 
 // Qwen3 emits <think>…</think> blocks as part of its chat template; strip them before
 // the user sees them. Safe for Gemma 4, which never emits these tags.

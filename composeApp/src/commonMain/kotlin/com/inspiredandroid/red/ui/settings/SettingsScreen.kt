@@ -132,7 +132,7 @@ import com.inspiredandroid.red.network.tools.ToolInfo
 import com.inspiredandroid.red.saveFileToDevice
 import com.inspiredandroid.red.ui.RedClearableTextField
 import com.inspiredandroid.red.ui.RedOutlinedTextField
-import com.inspiredandroid.red.ui.components.KaiSlider
+import com.inspiredandroid.red.ui.components.RedSlider
 import com.inspiredandroid.red.ui.components.SettingsListItem
 import com.inspiredandroid.red.ui.components.VerticalScrollbarForScroll
 import com.inspiredandroid.red.ui.handCursor
@@ -140,9 +140,9 @@ import com.inspiredandroid.red.ui.icons.DragIndicator
 import com.inspiredandroid.red.ui.icons.Replay
 import com.inspiredandroid.red.ui.icons.Visibility
 import com.inspiredandroid.red.ui.icons.VisibilityOff
-import com.inspiredandroid.red.ui.kaiAdaptiveCardBorder
-import com.inspiredandroid.red.ui.kaiAdaptiveCardColors
-import com.inspiredandroid.red.ui.kaiAdaptiveCardSurface
+import com.inspiredandroid.red.ui.redAdaptiveCardBorder
+import com.inspiredandroid.red.ui.redAdaptiveCardColors
+import com.inspiredandroid.red.ui.redAdaptiveCardSurface
 
 import com.inspiredandroid.red.ui.sandbox.SandboxProgressRow
 import io.github.vinceglb.filekit.dialogs.FileKitType
@@ -656,8 +656,8 @@ internal fun SettingsCard(
 ) {
     Card(
         modifier = modifier,
-        colors = kaiAdaptiveCardColors(),
-        border = kaiAdaptiveCardBorder(),
+        colors = redAdaptiveCardColors(),
+        border = redAdaptiveCardBorder(),
     ) {
         Column(
             modifier = Modifier

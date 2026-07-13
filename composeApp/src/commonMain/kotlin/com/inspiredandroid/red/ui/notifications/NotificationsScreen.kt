@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.inspiredandroid.red.ui.chat.ChatUiState
 import com.inspiredandroid.red.ui.handCursor
-import com.inspiredandroid.red.ui.kaiAdaptiveCardSurface
+import com.inspiredandroid.red.ui.redAdaptiveCardSurface
 import com.inspiredandroid.red.BackIcon
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -95,7 +95,7 @@ fun NotificationsScreen(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .kaiAdaptiveCardSurface()
+                                .redAdaptiveCardSurface()
                                 .let { modifier ->
                                     val cid = notification.conversationId
                                     if (cid != null) {

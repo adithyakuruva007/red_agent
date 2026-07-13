@@ -217,14 +217,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.inspiredandroid.red.ui.RedOutlinedTextField
-import com.inspiredandroid.red.ui.components.KaiChip
+import com.inspiredandroid.red.ui.components.RedChip
 import com.inspiredandroid.red.ui.handCursor
-import com.inspiredandroid.red.ui.kaiAdaptiveCardBorder
-import com.inspiredandroid.red.ui.kaiAdaptiveCardColors
+import com.inspiredandroid.red.ui.redAdaptiveCardBorder
+import com.inspiredandroid.red.ui.redAdaptiveCardColors
 import red.composeapp.generated.resources.Res
 import red.composeapp.generated.resources.bot_message_copy_content_description
-import red.composeapp.generated.resources.kai_ui_code_copy
-import red.composeapp.generated.resources.kai_ui_render_failed
+import red.composeapp.generated.resources.red_ui_code_copy
+import red.composeapp.generated.resources.red_ui_render_failed
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.stringResource
@@ -274,7 +274,7 @@ fun RedUiRenderer(
 
     if (hasError) {
         Text(
-            text = stringResource(Res.string.kai_ui_render_failed),
+            text = stringResource(Res.string.red_ui_render_failed),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.error,
             modifier = modifier,
@@ -295,8 +295,8 @@ fun RedUiRenderer(
             if (wrapInCard) {
                 Card(
                     modifier = modifier.fillMaxWidth().wrapContentHeight(),
-                    colors = kaiAdaptiveCardColors(),
-                    border = kaiAdaptiveCardBorder(),
+                    colors = redAdaptiveCardColors(),
+                    border = redAdaptiveCardBorder(),
                 ) {
                     Column(Modifier.padding(12.dp).wrapContentHeight()) {
                         RenderNode(
@@ -453,8 +453,8 @@ private fun RenderCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth().wrapContentHeight(),
-        colors = kaiAdaptiveCardColors(),
-        border = kaiAdaptiveCardBorder(),
+        colors = redAdaptiveCardColors(),
+        border = redAdaptiveCardBorder(),
     ) {
         Column(
             modifier = Modifier.padding(16.dp).wrapContentHeight(),
@@ -1149,7 +1149,7 @@ private fun RenderChipGroup(
             val value = chip.value.ifEmpty { chip.label }
             key(value) {
                 if (isDisplayOnly) {
-                    KaiChip { Text(chip.label) }
+                    RedChip { Text(chip.label) }
                 } else {
                     val isSelected by remember {
                         derivedStateOf {
@@ -1157,10 +1157,10 @@ private fun RenderChipGroup(
                             csv.split(",").contains(value)
                         }
                     }
-                    KaiChip(
+                    RedChip(
                         selected = isSelected,
                         onClick = {
-                            if (!isInteractive) return@KaiChip
+                            if (!isInteractive) return@RedChip
                             val current = (formState[node.id] ?: "").split(",").filter { it.isNotEmpty() }.toSet()
                             val newSelection = if (isMulti) {
                                 if (isSelected) current - value else current + value
@@ -1240,7 +1240,7 @@ private fun RenderCode(node: CodeNode) {
             ) {
                 Icon(
                     imageVector = Icons.Filled.ContentCopy,
-                    contentDescription = stringResource(Res.string.kai_ui_code_copy),
+                    contentDescription = stringResource(Res.string.red_ui_code_copy),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(16.dp),
                 )

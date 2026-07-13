@@ -40,7 +40,7 @@ import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
 import com.inspiredandroid.red.data.ServiceEntry
 import com.inspiredandroid.red.ui.handCursor
-import com.inspiredandroid.red.ui.kaiIconButtonSurface
+import com.inspiredandroid.red.ui.redIconButtonSurface
 import kotlinx.collections.immutable.ImmutableList
 import org.jetbrains.compose.resources.vectorResource
 
@@ -58,7 +58,7 @@ internal fun ServiceSelector(
         Box(
             modifier = Modifier
                 .size(28.dp)
-                .kaiIconButtonSurface(shape = RoundedCornerShape(6.dp))
+                .redIconButtonSurface(shape = RoundedCornerShape(6.dp))
                 .clickable { expanded = true }
                 .handCursor(),
             contentAlignment = Alignment.Center,
