@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Red — AI Agent Chat UI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep:#0E1420;
+    --bg-panel:#151C29;
+    --bg-elevated:#1D2635;
+    --bg-elevated-2:#242F41;
+    --border-hairline:#26314480;
+    --accent:#5B8DEF;
+    --accent-soft:#5B8DEF26;
+    --agent-violet:#8B6CF2;
+    --agent-violet-soft:#8B6CF224;
+    --text-primary:#EAEFF5;
+    --text-secondary:#98A4B8;
+    --text-tertiary:#5E6B80;
+    --online:#3ED598;
+    --danger:#F26D6D;
+    --font-display:'Space Grotesk', sans-serif;
+    --font-body:'Inter', sans-serif;
+    --font-mono:'JetBrains Mono', monospace;
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+
+  body{
+    background: radial-gradient(circle at 50% -10%, #1A2436 0%, #0A0E16 65%);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:var(--font-body);
+    color:var(--text-primary);
+    padding:40px 20px;
+  }
+
+  /* ---------- Phone frame ---------- */
+  .phone{
+    width:390px;
+    height:820px;
+    background:var(--bg-deep);
+    border-radius:46px;
+    border:10px solid #05070C;
+    box-shadow:
+      0 0 0 1px #2A344A55,
+      0 40px 90px -20px rgba(0,0,0,0.7),
+      0 0 120px -40px var(--accent-soft);
+    position:relative;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+  }
+  .notch{
+    position:absolute; top:10px; left:50%; transform:translateX(-50%);
+    width:120px; height:26px; background:#05070C; border-radius:20px; z-index:50;
+  }
+  .statusbar{
+    height:48px; flex-shrink:0; display:flex; align-items:flex-end; justify-content:space-between;
+    padding:0 26px 6px; font-family:var(--font-mono); font-size:13px; color:var(--text-primary); font-weight:500;
+  }
+  .statusbar .icons{ display:flex; gap:6px; align-items:center; }
+
+  /* ---------- Screen stack ---------- */
+  .screens{ position:relative; flex:1; overflow:hidden; }
+  .screen{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column;
+    background:var(--bg-deep);
+    transition: transform .38s cubic-bezier(.22,.9,.32,1), opacity .3s ease;
+  }
+  #screen-list{ transform:translateX(0); z-index:2; }
+  #screen-chat{ transform:translateX(100%); z-index:3; }
+  .phone.chat-open #screen-list{ transform:translateX(-18%); filter:brightness(.6); }
+  .phone.chat-open #screen-chat{ transform:translateX(0); }
+
+  /* ================= CHAT LIST SCREEN ================= */
+  .list-header{
+    padding:6px 20px 14px;
+    flex-shrink:0;
+  }
+  .list-header h1{
+    font-family:var(--font-display); font-size:28px; font-weight:700; letter-spacing:-0.02em;
+    display:flex; align-items:center; gap:9px;
+  }
+  .list-header h1 .dot{
+    width:8px;height:8px;border-radius:50%;background:var(--online);
+    box-shadow:0 0 10px var(--online);
+  }
+  .search{
+    margin-top:14px;
+    background:var(--bg-panel);
+    border:1px solid var(--border-hairline);
+    border-radius:14px;
+    padding:10px 14px;
+    display:flex; align-items:center; gap:9px;
+    color:var(--text-tertiary);
+    font-size:14.5px;
+  }
+  .search svg{ flex-shrink:0; opacity:.7; }
+
+  .filter-row{
+    display:flex; gap:8px; padding:14px 20px 4px; flex-shrink:0; overflow-x:auto;
+  }
+  .filter-pill{
+    font-family:var(--font-body); font-size:13px; font-weight:600;
+    padding:7px 14px; border-radius:100px; white-space:nowrap;
+    border:1px solid var(--border-hairline); color:var(--text-secondary);
+  }
+  .filter-pill.active{
+    background:var(--accent); color:#fff; border-color:var(--accent);
+  }
+
+  .chat-list{ flex:1; overflow-y:auto; padding:8px 10px 130px; }
+  .chat-row{
+    display:flex; gap:12px; padding:11px 10px; border-radius:16px;
+    align-items:center; cursor:pointer;
+  }
+  .chat-row:active{ background:var(--bg-panel); }
+
+  .avatar{
+    width:52px; height:52px; border-radius:16px; flex-shrink:0; position:relative;
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-display); font-weight:700; font-size:18px; color:#fff;
+  }
+  .avatar.grad-1{ background:linear-gradient(145deg,#5B8DEF,#3E5FCB); }
+  .avatar.grad-2{ background:linear-gradient(145deg,#8B6CF2,#5E3FCB); }
+  .avatar.grad-3{ background:linear-gradient(145deg,#3ED598,#1FA876); }
+  .avatar.grad-4{ background:linear-gradient(145deg,#F2A65B,#CB7A3E); }
+  .avatar.grad-5{ background:linear-gradient(145deg,#F26D9B,#CB3E6F); }
+
+  .avatar .ring{
+    position:absolute; inset:-3px; border-radius:19px; border:2px solid var(--online);
+    opacity:0; animation:pulseRing 2s ease-in-out infinite;
+  }
+  .avatar.active .ring{ opacity:1; }
+  @keyframes pulseRing{
+    0%{ transform:scale(.94); opacity:.9; }
+    70%{ transform:scale(1.08); opacity:0; }
+    100%{ opacity:0; }
+  }
+  .status-dot{
+    position:absolute; bottom:-2px; right:-2px; width:14px; height:14px; border-radius:50%;
+    background:var(--online); border:3px solid var(--bg-deep);
+  }
+  .status-dot.working{ background:var(--accent); }
+
+  .chat-meta{ flex:1; min-width:0; }
+  .chat-meta .row1{ display:flex; justify-content:space-between; align-items:baseline; gap:8px; }
+  .chat-meta .name{ font-weight:600; font-size:15.5px; letter-spacing:-.01em; }
+  .chat-meta .time{ font-size:12px; color:var(--text-tertiary); font-family:var(--font-mono); flex-shrink:0; }
+  .chat-meta .row2{ display:flex; justify-content:space-between; align-items:center; gap:8px; margin-top:3px; }
+  .chat-meta .preview{
+    font-size:13.5px; color:var(--text-secondary); overflow:hidden; text-overflow:ellipsis;
+    white-space:nowrap; display:flex; align-items:center; gap:5px;
+  }
+  .chat-meta .preview .tool-chip{
+    font-size:11px; color:var(--accent); background:var(--accent-soft);
+    padding:2px 7px; border-radius:8px; font-weight:600; flex-shrink:0;
+  }
+  .badge{
+    background:var(--accent); color:#fff; font-size:11px; font-weight:700;
+    min-width:19px; height:19px; border-radius:10px; display:flex; align-items:center; justify-content:center;
+    padding:0 5px; flex-shrink:0;
+  }
+  .badge.muted{ background:var(--bg-elevated-2); color:var(--text-tertiary); }
+
+  .fab{
+    position:absolute; right:20px; bottom:104px; width:54px; height:54px; border-radius:18px;
+    background:linear-gradient(145deg,var(--accent),#3E5FCB);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 10px 30px -6px #5B8DEF80, 0 0 0 1px #ffffff14 inset;
+    z-index:5;
+  }
+
+  /* ---------- Floating bottom nav ---------- */
+  .bottom-nav{
+    position:absolute; left:16px; right:16px; bottom:22px; z-index:6;
+    background:#151C29E6;
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+    border:1px solid #2A344A80;
+    border-radius:24px;
+    padding:8px;
+    display:flex;
+    gap:4px;
+    box-shadow:0 16px 40px -12px rgba(0,0,0,.55);
+  }
+  .nav-item{
+    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:3px; padding:8px 4px 7px; border-radius:16px; position:relative;
+    color:var(--text-tertiary);
+  }
+  .nav-item .ic{ width:22px; height:22px; }
+  .nav-item .nlabel{ font-size:10px; font-weight:600; letter-spacing:.01em; }
+  .nav-item.active{ color:var(--accent); background:var(--accent-soft); }
+  .nav-item .nav-badge{
+    position:absolute; top:4px; right:20%; min-width:15px; height:15px; border-radius:8px;
+    background:var(--danger); color:#fff; font-size:9.5px; font-weight:700;
+    display:flex; align-items:center; justify-content:center; padding:0 4px;
+    border:2px solid var(--bg-panel);
+  }
+  .nav-item .sandbox-dot{
+    position:absolute; top:6px; right:23%; width:7px; height:7px; border-radius:50%;
+    background:var(--online); box-shadow:0 0 6px var(--online);
+  }
+
+  /* ================= CONVERSATION SCREEN ================= */
+  .chat-header{
+    flex-shrink:0; padding:8px 12px 12px; display:flex; align-items:center; gap:10px;
+    border-bottom:1px solid var(--border-hairline);
+    background:var(--bg-deep);
+  }
+  .back-btn{ width:36px; height:36px; display:flex; align-items:center; justify-content:center; color:var(--text-primary); flex-shrink:0; }
+  .chat-header .avatar{ width:38px; height:38px; border-radius:12px; font-size:14px; }
+  .chat-header .hinfo{ flex:1; min-width:0; }
+  .chat-header .hinfo .name{ font-weight:600; font-size:15px; letter-spacing:-.01em; }
+  .chat-header .hinfo .status{
+    font-size:12px; color:var(--accent); display:flex; align-items:center; gap:5px; margin-top:1px;
+  }
+  .chat-header .hinfo .status .think-dots{ display:inline-flex; gap:2px; }
+  .chat-header .hinfo .status .think-dots span{
+    width:3px; height:3px; border-radius:50%; background:var(--accent);
+    animation: think 1.2s infinite ease-in-out;
+  }
+  .chat-header .hinfo .status .think-dots span:nth-child(2){ animation-delay:.15s; }
+  .chat-header .hinfo .status .think-dots span:nth-child(3){ animation-delay:.3s; }
+  @keyframes think{ 0%,60%,100%{ opacity:.25; transform:translateY(0);} 30%{ opacity:1; transform:translateY(-2px);} }
+  .header-icon{ width:34px; height:34px; display:flex; align-items:center; justify-content:center; color:var(--text-secondary); flex-shrink:0; }
+
+  .messages{
+    flex:1; overflow-y:auto; padding:16px 14px 10px; display:flex; flex-direction:column; gap:10px;
+    background-image: radial-gradient(circle at 15% 8%, #5B8DEF0d 0%, transparent 40%), radial-gradient(circle at 85% 30%, #8B6CF20d 0%, transparent 40%);
+  }
+  .day-chip{
+    align-self:center; font-size:11px; color:var(--text-tertiary); background:var(--bg-panel);
+    padding:4px 12px; border-radius:100px; margin:6px 0; font-weight:500;
+  }
+
+  .bubble-row{ display:flex; gap:8px; max-width:88%; }
+  .bubble-row.user{ align-self:flex-end; flex-direction:row-reverse; }
+  .bubble-row.agent{ align-self:flex-start; }
+  .bubble-row .mini-avatar{
+    width:26px; height:26px; border-radius:9px; flex-shrink:0; margin-top:auto;
+    background:linear-gradient(145deg,var(--agent-violet),#5E3FCB);
+    display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700;
+  }
+
+  .bubble{
+    padding:10px 13px 8px; border-radius:18px; font-size:14.5px; line-height:1.42;
+    position:relative;
+  }
+  .bubble-row.user .bubble{
+    background:linear-gradient(155deg,var(--accent),#4A78D9);
+    color:#fff; border-bottom-right-radius:5px;
+  }
+  .bubble-row.agent .bubble{
+    background:var(--bg-panel); border:1px solid var(--border-hairline);
+    color:var(--text-primary); border-bottom-left-radius:5px;
+  }
+  .bubble .msg-time{
+    display:block; text-align:right; font-size:10.5px; margin-top:3px; font-family:var(--font-mono);
+    opacity:.6;
+  }
+
+  .tool-trace{
+    display:flex; flex-direction:column; gap:6px; margin-bottom:6px;
+    background:var(--bg-elevated); border:1px solid var(--border-hairline);
+    border-radius:14px; padding:9px 11px; max-width:88%; align-self:flex-start;
+  }
+  .tool-trace .trace-item{
+    display:flex; align-items:center; gap:7px; font-size:12.5px; color:var(--text-secondary);
+  }
+  .tool-trace .trace-item .ic{ width:16px; height:16px; flex-shrink:0; color:var(--accent); }
+  .tool-trace .trace-item.done{ color:var(--text-tertiary); }
+  .tool-trace .trace-item.done .ic{ color:var(--online); }
+  .tool-trace .trace-label{ font-size:11px; font-weight:600; color:var(--agent-violet); text-transform:uppercase; letter-spacing:.04em; margin-bottom:1px; }
+
+  .typing-row{ align-self:flex-start; display:flex; gap:8px; align-items:center; }
+  .typing-bubble{
+    background:var(--bg-panel); border:1px solid var(--border-hairline);
+    padding:12px 16px; border-radius:18px; border-bottom-left-radius:5px;
+    display:flex; gap:4px;
+  }
+  .typing-bubble span{ width:6px; height:6px; border-radius:50%; background:var(--text-tertiary); animation:think 1.2s infinite ease-in-out; }
+  .typing-bubble span:nth-child(2){ animation-delay:.15s; }
+  .typing-bubble span:nth-child(3){ animation-delay:.3s; }
+
+  .composer{
+    flex-shrink:0; padding:10px 12px 18px; display:flex; align-items:flex-end; gap:8px;
+    border-top:1px solid var(--border-hairline); background:var(--bg-deep);
+  }
+  .composer-icon{
+    width:38px; height:38px; border-radius:12px; display:flex; align-items:center; justify-content:center;
+    color:var(--text-secondary); flex-shrink:0;
+  }
+  .composer-field{
+    flex:1; background:var(--bg-panel); border:1px solid var(--border-hairline); border-radius:20px;
+    padding:10px 14px; font-size:14.5px; color:var(--text-tertiary); min-height:20px; display:flex; align-items:center;
+  }
+  .send-btn{
+    width:38px; height:38px; border-radius:12px; flex-shrink:0;
+    background:linear-gradient(145deg,var(--accent),#3E5FCB);
+    display:flex; align-items:center; justify-content:center;
+  }
+
+  /* ================= TAB TRACK (Chats / Sandbox / Alerts / Settings) ================= */
+  .tab-track{
+    flex:1; display:flex; width:400%; height:100%; min-height:0;
+    transition: transform .4s cubic-bezier(.22,.9,.32,1);
+  }
+  .tab-panel{
+    width:25%; height:100%; flex-shrink:0; min-width:0;
+    display:flex; flex-direction:column; overflow:hidden;
+    position:relative;
+  }
+  .pane-body{ flex:1; overflow-y:auto; padding:2px 16px 130px; }
+  .pane-body::-webkit-scrollbar{ width:0; }
+
+  .section-label{
+    font-size:11.5px; font-weight:700; color:var(--text-tertiary);
+    text-transform:uppercase; letter-spacing:.05em; margin:20px 2px 10px;
+  }
+  .section-label:first-child{ margin-top:6px; }
+
+  /* ---- Sandbox tab ---- */
+  .sandbox-card{
+    background:var(--bg-panel); border:1px solid var(--border-hairline);
+    border-radius:18px; padding:14px; margin-top:8px;
+  }
+  .sandbox-card-top{
+    display:flex; justify-content:space-between; align-items:center;
+    flex-wrap:wrap; gap:6px; margin-bottom:12px;
+  }
+  .sandbox-status{
+    font-size:12.5px; font-weight:600; color:var(--online);
+    display:flex; align-items:center; gap:7px;
+  }
+  .online-pulse{
+    width:8px; height:8px; border-radius:50%; background:var(--online);
+    box-shadow:0 0 8px var(--online); flex-shrink:0;
+    animation: pulseDot 1.6s ease-in-out infinite;
+  }
+  @keyframes pulseDot{ 0%,100%{ opacity:1; } 50%{ opacity:.35; } }
+  .sandbox-spec{ font-size:11px; color:var(--text-tertiary); font-family:var(--font-mono); }
+
+  .sandbox-subtabs{
+    display:flex; gap:4px; background:var(--bg-elevated); border:1px solid var(--border-hairline);
+    border-radius:12px; padding:3px; margin-bottom:12px;
+  }
+  .sandbox-subtab{
+    flex:1; text-align:center; padding:7px 0; border-radius:9px;
+    font-size:12px; font-weight:600; color:var(--text-secondary);
+  }
+  .sandbox-subtab.active{ background:var(--accent); color:#fff; }
+
+  .sub-panel{ display:none; }
+  .sub-panel.active{ display:block; }
+
+  .file-row, .pkg-row{
+    display:flex; align-items:center; gap:12px; padding:10px 2px;
+    border-bottom:1px solid var(--border-hairline);
+  }
+  .file-row:last-child, .pkg-row:last-child{ border-bottom:none; }
+  .file-ic{
+    width:34px; height:34px; border-radius:10px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 0 0 1px #ffffff0d inset;
+  }
+  .file-ic svg{ width:17px; height:17px; }
+  .ic-amber{ background:linear-gradient(150deg,#FFCB66,#E1972E); }
+  .ic-pink{ background:linear-gradient(150deg,#FF8FC7,#D14F96); }
+  .file-meta, .pkg-meta{ flex:1; min-width:0; }
+  .file-name, .pkg-name{ font-size:13.5px; font-weight:600; font-family:var(--font-mono); letter-spacing:-.01em; }
+  .file-sub, .pkg-sub{ font-size:11.5px; color:var(--text-tertiary); margin-top:1px; }
+  .file-size, .pkg-ver{ font-size:11.5px; color:var(--text-secondary); font-family:var(--font-mono); flex-shrink:0; }
+  .pkg-dot{ width:7px; height:7px; border-radius:50%; background:var(--online); flex-shrink:0; box-shadow:0 0 6px var(--online); }
+
+  .terminal{
+    background:#0A0E16; border:1px solid var(--border-hairline);
+    border-radius:14px; overflow:hidden;
+  }
+  .terminal-bar{
+    display:flex; align-items:center; gap:6px; padding:9px 12px;
+    background:#11161F; border-bottom:1px solid var(--border-hairline);
+  }
+  .tdot{ width:9px; height:9px; border-radius:50%; }
+  .tdot.r{ background:#F26D6D; }
+  .tdot.y{ background:#F2C46D; }
+  .tdot.g{ background:#3ED598; }
+  .terminal-title{ margin-left:5px; font-family:var(--font-mono); font-size:11px; color:var(--text-tertiary); }
+  .terminal-body{
+    padding:12px 14px 14px; font-family:var(--font-mono); font-size:12px;
+    line-height:1.75; color:#C7D0DE;
+  }
+  .terminal-body .tprompt{ color:var(--online); margin-right:5px; }
+  .terminal-body .tdim{ color:var(--text-tertiary); }
+  .tcursor{ color:var(--online); animation: think 1s steps(2) infinite; }
+
+  .stat-row{ display:flex; gap:10px; }
+  .stat-card{
+    flex:1; background:var(--bg-panel); border:1px solid var(--border-hairline);
+    border-radius:14px; padding:12px 12px 11px;
+  }
+  .stat-val{ font-family:var(--font-mono); font-size:17px; font-weight:600; letter-spacing:-.01em; }
+  .stat-key{ font-size:11px; color:var(--text-tertiary); margin-top:3px; }
+
+  .simple-row{
+    display:flex; align-items:center; gap:12px; padding:10px 4px;
+    border-bottom:1px solid var(--border-hairline);
+  }
+  .simple-row:last-child{ border-bottom:none; }
+  .simple-ic{
+    width:36px; height:36px; border-radius:12px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-display); font-weight:700; font-size:14px; color:#fff;
+  }
+  .simple-ic.sb1{ background:linear-gradient(145deg,var(--agent-violet),#5E3FCB); }
+  .simple-ic.sb2{ background:linear-gradient(145deg,#3ED598,#1FA876); }
+  .simple-ic.system{ background:var(--bg-elevated-2); color:var(--text-secondary); font-size:15px; }
+  .simple-meta{ flex:1; min-width:0; }
+  .simple-name{ font-size:14px; font-weight:600; letter-spacing:-.005em; }
+  .simple-sub{ font-size:12px; color:var(--text-tertiary); margin-top:1px; }
+
+  /* ---- Alerts tab ---- */
+  .simple-row .badge{ margin-left:auto; background:var(--accent); width:8px; height:8px; min-width:0; padding:0; font-size:0; }
+
+  /* ---- Settings tab ---- */
+  .profile-row{ display:flex; align-items:center; gap:14px; padding:12px 4px 22px; }
+  .setting-row{
+    display:flex; align-items:center; gap:13px; padding:13px 4px;
+    border-bottom:1px solid var(--border-hairline); font-size:14.5px; font-weight:500;
+  }
+  .setting-row:last-child{ border-bottom:none; }
+  .setting-ic{
+    width:29px; height:29px; border-radius:9px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 0 0 1px #ffffff0d inset;
+  }
+  .setting-ic svg{ width:16px; height:16px; }
+  .ic-purple{ background:linear-gradient(150deg,#9D82F5,#6C4FD1); }
+  .ic-red{ background:linear-gradient(150deg,#FF7A7A,#E14848); }
+  .ic-blue{ background:linear-gradient(150deg,#6FA0FA,#3E5FCB); }
+  .ic-teal{ background:linear-gradient(150deg,#4EE0A6,#1FA876); }
+  .ic-grey{ background:linear-gradient(150deg,#9AA3B5,#69728A); }
+  .ic-cyan{ background:linear-gradient(150deg,#52CEE0,#1F94A8); }
+  .setting-label{ flex:1; }
+  .setting-val{ font-size:13px; color:var(--text-tertiary); }
+
+  .chat-list::-webkit-scrollbar, .messages::-webkit-scrollbar{ width:0; }
+
+  .credit{
+    margin-top:22px; text-align:center; color:#5E6B80; font-family:var(--font-mono); font-size:12px;
+  }
+  .wrap{ display:flex; flex-direction:column; align-items:center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="phone" id="phone">
+  <div class="notch"></div>
+
+  <div class="screens">
+
+    <!-- ============ SCREEN 1: TABBED ROOT (Chats / Sandbox / Alerts / Settings) ============ -->
+    <div class="screen" id="screen-list">
+      <div class="statusbar">
+        <span>9:41</span>
+        <div class="icons">
+          <span>••••</span><span>Wi‑Fi</span><span>82%</span>
+        </div>
+      </div>
+
+      <div class="tab-track" id="tabTrack">
+
+        <!-- ---- TAB 0: CHATS ---- -->
+        <div class="tab-panel">
+          <div class="list-header">
+            <h1><span class="dot"></span>Red</h1>
+            <div class="search">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              Search agents & chats
+            </div>
+          </div>
+
+          <div class="filter-row">
+            <div class="filter-pill active">All</div>
+            <div class="filter-pill">Working</div>
+            <div class="filter-pill">Pinned</div>
+            <div class="filter-pill">Archived</div>
+          </div>
+
+          <div class="chat-list">
+
+            <div class="chat-row" onclick="openChat()">
+              <div class="avatar grad-2 active">Ω<div class="ring"></div><div class="status-dot working"></div></div>
+              <div class="chat-meta">
+                <div class="row1"><span class="name">Orion — Research</span><span class="time">2m</span></div>
+                <div class="row2">
+                  <span class="preview"><span class="tool-chip">🔍 searching</span> "quarterly market trends…"</span>
+                  <span class="badge">3</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="chat-row" onclick="openChat()">
+              <div class="avatar grad-1">C<div class="status-dot"></div></div>
+              <div class="chat-meta">
+                <div class="row1"><span class="name">Cove — Code Assistant</span><span class="time">14m</span></div>
+                <div class="row2"><span class="preview">Refactored the auth module ✅</span></div>
+              </div>
+            </div>
+
+            <div class="chat-row" onclick="openChat()">
+              <div class="avatar grad-4">F</div>
+              <div class="chat-meta">
+                <div class="row1"><span class="name">Fern — Travel Planner</span><span class="time">1h</span></div>
+                <div class="row2"><span class="preview">Found 3 flights under ₹18,000</span><span class="badge muted">1</span></div>
+              </div>
+            </div>
+
+            <div class="chat-row" onclick="openChat()">
+              <div class="avatar grad-3">L<div class="status-dot"></div></div>
+              <div class="chat-meta">
+                <div class="row1"><span class="name">Ledger — Finance</span><span class="time">3h</span></div>
+                <div class="row2"><span class="preview">You: what's my burn rate this month?</span></div>
+              </div>
+            </div>
+
+            <div class="chat-row" onclick="openChat()">
+              <div class="avatar grad-5">M</div>
+              <div class="chat-meta">
+                <div class="row1"><span class="name">Muse — Writing</span><span class="time">Yesterday</span></div>
+                <div class="row2"><span class="preview">Draft v2 is ready for review</span></div>
+              </div>
+            </div>
+
+            <div class="chat-row" onclick="openChat()">
+              <div class="avatar grad-2">S</div>
+              <div class="chat-meta">
+                <div class="row1"><span class="name">Scout — General</span><span class="time">Yesterday</span></div>
+                <div class="row2"><span class="preview">Sure, I can help with that.</span></div>
+              </div>
+            </div>
+
+            <div class="chat-row" onclick="openChat()">
+              <div class="avatar grad-1">T</div>
+              <div class="chat-meta">
+                <div class="row1"><span class="name">Tally — Data Analyst</span><span class="time">Mon</span></div>
+                <div class="row2"><span class="preview">Uploaded chart: revenue_q3.csv</span></div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="fab">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+        </div>
+
+        <!-- ---- TAB 1: LINUX SANDBOX ---- -->
+        <div class="tab-panel">
+          <div class="list-header">
+            <h1>Sandbox</h1>
+          </div>
+          <div class="pane-body">
+            <div class="sandbox-card">
+              <div class="sandbox-card-top">
+                <div class="sandbox-status"><span class="online-pulse"></span>Session running · 00:42:11</div>
+                <div class="sandbox-spec">1 vCPU · 512MB RAM · Alpine Linux 3.19</div>
+              </div>
+
+              <div class="sandbox-subtabs">
+                <div class="sandbox-subtab active" data-pane="pane-terminal" onclick="setSandboxTab(this)">Terminal</div>
+                <div class="sandbox-subtab" data-pane="pane-files" onclick="setSandboxTab(this)">Files</div>
+                <div class="sandbox-subtab" data-pane="pane-packages" onclick="setSandboxTab(this)">Packages</div>
+              </div>
+
+              <!-- Terminal -->
+              <div class="sub-panel active" id="pane-terminal">
+                <div class="terminal">
+                  <div class="terminal-bar"><span class="tdot r"></span><span class="tdot y"></span><span class="tdot g"></span><span class="terminal-title">agent@sandbox:~</span></div>
+                  <div class="terminal-body">
+                    <div><span class="tprompt">$</span> apk add python3 py3-pip</div>
+                    <div class="tdim">(1/9) Installing python3 (3.11.8-r0)</div>
+                    <div><span class="tprompt">$</span> pip install pandas --break-system-packages</div>
+                    <div class="tdim">Successfully installed pandas-2.2.2</div>
+                    <div><span class="tprompt">$</span> python3 analyze.py</div>
+                    <div class="tdim">Loaded 12,480 rows · writing chart.png</div>
+                    <div><span class="tprompt">$</span> <span class="tcursor">▍</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Files -->
+              <div class="sub-panel" id="pane-files">
+                <div class="file-row">
+                  <div class="file-ic ic-amber"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/></svg></div>
+                  <div class="file-meta"><div class="file-name">workspace/</div><div class="file-sub">Folder · 6 items</div></div>
+                </div>
+                <div class="file-row">
+                  <div class="file-ic ic-amber"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/></svg></div>
+                  <div class="file-meta"><div class="file-name">output/</div><div class="file-sub">Folder · 2 items</div></div>
+                </div>
+                <div class="file-row">
+                  <div class="file-ic ic-blue"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 8 5 12 9 16"/><polyline points="15 8 19 12 15 16"/></svg></div>
+                  <div class="file-meta"><div class="file-name">analyze.py</div><div class="file-sub">Modified 2m ago</div></div>
+                  <div class="file-size">3.1 KB</div>
+                </div>
+                <div class="file-row">
+                  <div class="file-ic ic-teal"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16M4 15h16M10 4v16"/></svg></div>
+                  <div class="file-meta"><div class="file-name">revenue_q3.csv</div><div class="file-sub">Modified 14m ago</div></div>
+                  <div class="file-size">228 KB</div>
+                </div>
+                <div class="file-row">
+                  <div class="file-ic ic-pink"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="10" r="1.5"/><path d="M21 17l-5.5-5.5a2 2 0 00-2.8 0L4 20"/></svg></div>
+                  <div class="file-meta"><div class="file-name">chart.png</div><div class="file-sub">Modified just now</div></div>
+                  <div class="file-size">96 KB</div>
+                </div>
+                <div class="file-row">
+                  <div class="file-ic ic-grey"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l5 5v13a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg></div>
+                  <div class="file-meta"><div class="file-name">requirements.txt</div><div class="file-sub">Modified 1h ago</div></div>
+                  <div class="file-size">0.4 KB</div>
+                </div>
+              </div>
+
+              <!-- Packages -->
+              <div class="sub-panel" id="pane-packages">
+                <div class="pkg-row">
+                  <span class="pkg-dot"></span>
+                  <div class="pkg-meta"><div class="pkg-name">python3</div><div class="pkg-sub">apk · core interpreter</div></div>
+                  <div class="pkg-ver">3.11.8</div>
+                </div>
+                <div class="pkg-row">
+                  <span class="pkg-dot"></span>
+                  <div class="pkg-meta"><div class="pkg-name">py3-pip</div><div class="pkg-sub">apk · package manager</div></div>
+                  <div class="pkg-ver">24.0</div>
+                </div>
+                <div class="pkg-row">
+                  <span class="pkg-dot"></span>
+                  <div class="pkg-meta"><div class="pkg-name">pandas</div><div class="pkg-sub">pip · data analysis</div></div>
+                  <div class="pkg-ver">2.2.2</div>
+                </div>
+                <div class="pkg-row">
+                  <span class="pkg-dot"></span>
+                  <div class="pkg-meta"><div class="pkg-name">numpy</div><div class="pkg-sub">pip · numerical compute</div></div>
+                  <div class="pkg-ver">1.26.4</div>
+                </div>
+                <div class="pkg-row">
+                  <span class="pkg-dot"></span>
+                  <div class="pkg-meta"><div class="pkg-name">git</div><div class="pkg-sub">apk · version control</div></div>
+                  <div class="pkg-ver">2.43.0</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="section-label">Resources</div>
+            <div class="stat-row">
+              <div class="stat-card"><div class="stat-val">31%</div><div class="stat-key">CPU</div></div>
+              <div class="stat-card"><div class="stat-val">180MB</div><div class="stat-key">Memory</div></div>
+              <div class="stat-card"><div class="stat-val">240ms</div><div class="stat-key">Latency</div></div>
+            </div>
+
+            <div class="section-label">Recent sessions</div>
+            <div class="simple-row"><div class="simple-ic sb1">Ω</div><div class="simple-meta"><div class="simple-name">Orion — chart generation</div><div class="simple-sub">Ended 1h ago · 3m 12s</div></div></div>
+            <div class="simple-row"><div class="simple-ic sb2">T</div><div class="simple-meta"><div class="simple-name">Tally — CSV cleanup</div><div class="simple-sub">Ended yesterday · 8m 40s</div></div></div>
+          </div>
+        </div>
+
+        <!-- ---- TAB 2: NOTIFICATIONS ---- -->
+        <div class="tab-panel">
+          <div class="list-header">
+            <h1>Alerts</h1>
+          </div>
+          <div class="pane-body">
+            <div class="section-label">New</div>
+            <div class="simple-row"><div class="simple-ic grad-2">Ω</div><div class="simple-meta"><div class="simple-name">Orion finished the summary</div><div class="simple-sub">Q2 EV market report is ready · 2m</div></div><span class="badge">•</span></div>
+            <div class="simple-row"><div class="simple-ic grad-3">L</div><div class="simple-meta"><div class="simple-name">Ledger flagged a spend spike</div><div class="simple-sub">18% over budget this week · 40m</div></div><span class="badge">•</span></div>
+
+            <div class="section-label">Earlier</div>
+            <div class="simple-row"><div class="simple-ic grad-1">C</div><div class="simple-meta"><div class="simple-name">Cove pushed a fix</div><div class="simple-sub">auth-module refactor merged · 3h</div></div></div>
+            <div class="simple-row"><div class="simple-ic grad-4">F</div><div class="simple-meta"><div class="simple-name">Fern found cheaper flights</div><div class="simple-sub">3 options under ₹18,000 · Yesterday</div></div></div>
+            <div class="simple-row"><div class="simple-ic system">⚙</div><div class="simple-meta"><div class="simple-name">Sandbox session expired</div><div class="simple-sub">Tally — CSV cleanup · Yesterday</div></div></div>
+          </div>
+        </div>
+
+        <!-- ---- TAB 3: SETTINGS ---- -->
+        <div class="tab-panel">
+          <div class="list-header">
+            <h1>Settings</h1>
+          </div>
+          <div class="pane-body">
+            <div class="profile-row">
+              <div class="avatar grad-2" style="width:54px;height:54px;border-radius:16px;font-size:19px;">A</div>
+              <div class="chat-meta"><div class="name" style="font-size:16px;">Ash</div><div class="preview">@ash · Red ID 8821</div></div>
+            </div>
+
+            <div class="section-label">Preferences</div>
+            <div class="setting-row">
+              <span class="setting-ic ic-purple"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 000 18c1.1 0 2-.7 2-1.8 0-.47-.2-.9-.5-1.24-.3-.32-.5-.75-.5-1.21 0-1.1.9-1.75 2-1.75h2.1c1.7 0 3.1-1.28 3.1-3C20 6.6 16.4 3 12 3z"/><circle cx="7.5" cy="10.5" r="1"/><circle cx="12" cy="7.5" r="1"/><circle cx="16.2" cy="10.2" r="1"/></svg></span>
+              <span class="setting-label">Appearance</span><span class="setting-val">Dark</span>
+            </div>
+            <div class="setting-row">
+              <span class="setting-ic ic-red"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></span>
+              <span class="setting-label">Notifications</span><span class="setting-val">On</span>
+            </div>
+            <div class="setting-row">
+              <span class="setting-ic ic-blue"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="9" width="14" height="10" rx="2"/><path d="M12 9V5m-3 0h6"/><circle cx="9" cy="14" r="1"/><circle cx="15" cy="14" r="1"/><path d="M2 13h3M19 13h3"/></svg></span>
+              <span class="setting-label">Agents & permissions</span>
+            </div>
+            <div class="setting-row">
+              <span class="setting-ic ic-teal"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M7 9l3 2.5L7 14M12 14h4"/></svg></span>
+              <span class="setting-label">Sandbox defaults</span>
+            </div>
+
+            <div class="section-label">Account</div>
+            <div class="setting-row">
+              <span class="setting-ic ic-grey"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg></span>
+              <span class="setting-label">Privacy & data</span>
+            </div>
+            <div class="setting-row">
+              <span class="setting-ic ic-cyan"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 8v.01"/></svg></span>
+              <span class="setting-label">About Red</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="bottom-nav">
+        <div class="nav-item active" onclick="setTab(0, this)">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+          <span class="nlabel">Chats</span>
+          <span class="nav-badge">4</span>
+        </div>
+        <div class="nav-item" onclick="setTab(1, this)">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+          <span class="nlabel">Sandbox</span>
+          <span class="sandbox-dot"></span>
+        </div>
+        <div class="nav-item" onclick="setTab(2, this)">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+          <span class="nlabel">Alerts</span>
+          <span class="nav-badge">2</span>
+        </div>
+        <div class="nav-item" onclick="setTab(3, this)">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          <span class="nlabel">Settings</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ SCREEN 2: CONVERSATION ============ -->
+    <div class="screen" id="screen-chat">
+      <div class="statusbar">
+        <span>9:41</span>
+        <div class="icons"><span>••••</span><span>Wi‑Fi</span><span>82%</span></div>
+      </div>
+
+      <div class="chat-header">
+        <div class="back-btn" onclick="closeChat()">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </div>
+        <div class="avatar grad-2">Ω</div>
+        <div class="hinfo">
+          <div class="name">Orion — Research</div>
+          <div class="status">Thinking <span class="think-dots"><span></span><span></span><span></span></span></div>
+        </div>
+        <div class="header-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+        </div>
+      </div>
+
+      <div class="messages">
+        <div class="day-chip">Today</div>
+
+        <div class="bubble-row user">
+          <div class="bubble">Can you pull together a quick summary of Q2 market trends in the EV space?<span class="msg-time">9:32</span></div>
+        </div>
+
+        <div class="tool-trace">
+          <div class="trace-label">Orion is working</div>
+          <div class="trace-item done">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="20 6 9 17 4 12"/></svg>
+            Searched web — "EV market trends Q2 2026"
+          </div>
+          <div class="trace-item done">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="20 6 9 17 4 12"/></svg>
+            Read 4 sources
+          </div>
+          <div class="trace-item">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+            Drafting summary…
+          </div>
+        </div>
+
+        <div class="bubble-row agent">
+          <div class="mini-avatar">Ω</div>
+          <div class="bubble">Here's the gist — EV sales grew steadily but battery‑supply costs remain the biggest headwind for smaller manufacturers.<span class="msg-time">9:33</span></div>
+        </div>
+
+        <div class="bubble-row agent">
+          <div class="mini-avatar">Ω</div>
+          <div class="bubble">Want me to break it down by region, or turn this into a slide?<span class="msg-time">9:33</span></div>
+        </div>
+
+        <div class="bubble-row user">
+          <div class="bubble">By region please 🌎<span class="msg-time">9:34</span></div>
+        </div>
+
+        <div class="typing-row">
+          <div class="mini-avatar">Ω</div>
+          <div class="typing-bubble"><span></span><span></span><span></span></div>
+        </div>
+      </div>
+
+      <div class="composer">
+        <div class="composer-icon">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+        </div>
+        <div class="composer-field">Message Orion…</div>
+        <div class="composer-icon">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4"/></svg>
+        </div>
+        <div class="send-btn">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="white"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+<div class="credit">Red — AI agent chat, prototype</div>
+</div>
+
+<script>
+  function openChat(){ document.getElementById('phone').classList.add('chat-open'); }
+  function closeChat(){ document.getElementById('phone').classList.remove('chat-open'); }
+  function setTab(idx, el){
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('tabTrack').style.transform = 'translateX(-' + (idx * 25) + '%)';
+  }
+  function setSandboxTab(el){
+    const pane = el.getAttribute('data-pane');
+    el.parentElement.querySelectorAll('.sandbox-subtab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    el.closest('.sandbox-card').querySelectorAll('.sub-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById(pane).classList.add('active');
+  }
+</script>
+</body>
+</html>

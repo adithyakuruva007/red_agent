@@ -1,12 +1,5 @@
-@file:Suppress("DEPRECATION")
-
 package com.inspiredandroid.red.ui
- 
-import org.koin.compose.koinInject
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.inspiredandroid.red.data.AppSettings
-import com.inspiredandroid.red.data.AppColorScheme
-import androidx.compose.ui.graphics.Brush
+
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -14,18 +7,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Typography
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,14 +25,95 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.sp
 
+val RedBgDeep = Color(0xFF0E1420)
+val RedBgPanel = Color(0xFF151C29)
+val RedBgElevated = Color(0xFF1D2635)
+val RedBgElevated2 = Color(0xFF242F41)
+val RedBorderHairline = Color(0x80263144)
+val RedAccent = Color(0xFF5B8DEF)
+val RedAccentSoft = Color(0x265B8DEF)
+val RedAgentViolet = Color(0xFF8B6CF2)
+val RedAgentVioletSoft = Color(0x248B6CF2)
+val RedTextPrimary = Color(0xFFEAEFF5)
+val RedTextSecondary = Color(0xFF98A4B8)
+val RedTextTertiary = Color(0xFF5E6B80)
+val RedOnline = Color(0xFF3ED598)
+val RedDanger = Color(0xFFF26D6D)
+
+val RedGrad1Start = Color(0xFF5B8DEF)
+val RedGrad1End = Color(0xFF3E5FCB)
+val RedGrad2Start = Color(0xFF8B6CF2)
+val RedGrad2End = Color(0xFF5E3FCB)
+val RedGrad3Start = Color(0xFF3ED598)
+val RedGrad3End = Color(0xFF1FA876)
+val RedGrad4Start = Color(0xFFF2A65B)
+val RedGrad4End = Color(0xFFCB7A3E)
+val RedGrad5Start = Color(0xFFF26D9B)
+val RedGrad5End = Color(0xFFCB3E6F)
+
+val RedOnlineShadow = Color(0xFF3ED598)
+val RedAccentShadow = Color(0x805B8DEF)
+
+// TODO: Replace with custom fonts (Space Grotesk, Inter, JetBrains Mono) once
+// Compose Resources font API is resolved for this project version.
+internal val DisplayFont = FontFamily.SansSerif
+internal val BodyFont = FontFamily.SansSerif
+internal val MonoFont = FontFamily.Monospace
+
+val RedTypography = Typography(
+    displayLarge = TextStyle(fontFamily = DisplayFont, fontWeight = FontWeight.Bold, fontSize = 28.sp, letterSpacing = (-0.02).sp),
+    displayMedium = TextStyle(fontFamily = DisplayFont, fontWeight = FontWeight.SemiBold, fontSize = 22.sp, letterSpacing = (-0.01).sp),
+    displaySmall = TextStyle(fontFamily = DisplayFont, fontWeight = FontWeight.Medium, fontSize = 18.sp),
+    headlineLarge = TextStyle(fontFamily = BodyFont, fontWeight = FontWeight.SemiBold, fontSize = 17.sp, letterSpacing = (-0.01).sp),
+    headlineMedium = TextStyle(fontFamily = BodyFont, fontWeight = FontWeight.SemiBold, fontSize = 15.5.sp, letterSpacing = (-0.01).sp),
+    headlineSmall = TextStyle(fontFamily = BodyFont, fontWeight = FontWeight.SemiBold, fontSize = 14.sp),
+    titleLarge = TextStyle(fontFamily = BodyFont, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, letterSpacing = (-0.01).sp),
+    titleMedium = TextStyle(fontFamily = BodyFont, fontWeight = FontWeight.Medium, fontSize = 14.5.sp),
+    titleSmall = TextStyle(fontFamily = BodyFont, fontWeight = FontWeight.Medium, fontSize = 13.sp),
+    bodyLarge = TextStyle(fontFamily = BodyFont, fontWeight = FontWeight.Normal, fontSize = 15.5.sp),
+    bodyMedium = TextStyle(fontFamily = BodyFont, fontWeight = FontWeight.Normal, fontSize = 14.5.sp, lineHeight = 20.sp),
+    bodySmall = TextStyle(fontFamily = BodyFont, fontWeight = FontWeight.Normal, fontSize = 13.sp),
+    labelLarge = TextStyle(fontFamily = BodyFont, fontWeight = FontWeight.SemiBold, fontSize = 12.sp),
+    labelMedium = TextStyle(fontFamily = BodyFont, fontWeight = FontWeight.Medium, fontSize = 11.sp),
+    labelSmall = TextStyle(fontFamily = BodyFont, fontWeight = FontWeight.Medium, fontSize = 10.sp),
+)
+
+val RedColorScheme = darkColorScheme(
+    primary = RedAccent,
+    onPrimary = Color.White,
+    primaryContainer = RedAccentSoft,
+    onPrimaryContainer = RedAccent,
+    secondary = RedAgentViolet,
+    onSecondary = Color.White,
+    secondaryContainer = RedAgentVioletSoft,
+    onSecondaryContainer = RedAgentViolet,
+    surface = RedBgPanel,
+    onSurface = RedTextPrimary,
+    surfaceVariant = RedBgElevated,
+    onSurfaceVariant = RedTextSecondary,
+    background = RedBgDeep,
+    onBackground = RedTextPrimary,
+    outline = RedBorderHairline,
+    outlineVariant = RedBorderHairline,
+    tertiary = RedOnline,
+    onTertiary = Color.White,
+    error = RedDanger,
+    onError = Color.White,
+)
+
+@Composable
 fun Modifier.handCursor() = pointerHoverIcon(PointerIcon.Hand, overrideDescendants = true)
 
 fun ColorScheme.withBlackBackground(): ColorScheme = copy(
@@ -55,92 +126,36 @@ val ColorScheme.isOledFlavor: Boolean get() = background == Color.Black
 val ColorScheme.isClaymorphism: Boolean get() = background == Color(0xFF1A1A24)
 
 @Composable
-fun redAdaptiveCardColors(): CardColors {
-    val scheme = MaterialTheme.colorScheme
-    return CardDefaults.cardColors(
-        containerColor = when {
-            scheme.isOledFlavor -> Color.Transparent
-            scheme.isClaymorphism -> Color(0xFF242432)
-            else -> scheme.surfaceVariant.copy(alpha = 0.5f)
-        }
-    )
-}
+fun redAdaptiveCardColors() = CardDefaults.cardColors(
+    containerColor = RedBgPanel,
+)
 
 @Composable
-fun redAdaptiveCardBorder(): BorderStroke? {
-    val scheme = MaterialTheme.colorScheme
-    return when {
-        scheme.isOledFlavor -> BorderStroke(1.dp, scheme.outlineVariant)
-        scheme.isClaymorphism -> BorderStroke(2.dp, Color.White.copy(alpha = 0.08f))
-        else -> null
-    }
-}
+fun redAdaptiveCardBorder() = BorderStroke(1.dp, RedBorderHairline)
 
 @Composable
 fun Modifier.redAdaptiveCardSurface(shape: Shape = CardDefaults.shape): Modifier {
-    val scheme = MaterialTheme.colorScheme
-    val finalShape = if (scheme.isClaymorphism) RoundedCornerShape(24.dp) else shape
+    val finalShape = RoundedCornerShape(12.dp)
     return this
         .clip(finalShape)
-        .background(
-            when {
-                scheme.isOledFlavor -> Color.Transparent
-                scheme.isClaymorphism -> Color(0xFF242432)
-                else -> scheme.surfaceVariant.copy(alpha = 0.5f)
-            }
-        )
-        .then(
-            when {
-                scheme.isOledFlavor -> Modifier.border(1.dp, scheme.outlineVariant, finalShape)
-                scheme.isClaymorphism -> Modifier.border(2.dp, Color.White.copy(alpha = 0.08f), finalShape)
-                else -> Modifier
-            }
-        )
+        .background(RedBgPanel)
+        .border(BorderStroke(1.dp, RedBorderHairline), finalShape)
 }
 
 @Composable
 fun Modifier.redInputSurface(isFocused: Boolean, shape: Shape = RoundedCornerShape(12.dp)): Modifier {
-    val scheme = MaterialTheme.colorScheme
-    val finalBg = when {
-        scheme.isOledFlavor -> Color.Transparent
-        scheme.isClaymorphism -> Color(0xFF242432)
-        else -> scheme.surfaceContainerHigh
-    }
-    val finalBorder = when {
-        isFocused -> BorderStroke(1.dp, scheme.primary)
-        scheme.isOledFlavor -> BorderStroke(1.dp, scheme.outlineVariant)
-        scheme.isClaymorphism -> BorderStroke(1.dp, Color.White.copy(alpha = 0.08f))
-        else -> BorderStroke(1.dp, scheme.outline.copy(alpha = 0.5f))
-    }
     return this
         .clip(shape)
-        .background(finalBg)
-        .border(finalBorder, shape)
+        .background(RedBgPanel)
+        .border(BorderStroke(if (isFocused) 1.dp else 0.dp, if (isFocused) RedAccent else RedBorderHairline), shape)
 }
 
 @Composable
 fun Modifier.redIconButtonSurface(shape: Shape = RoundedCornerShape(8.dp)): Modifier {
-    val scheme = MaterialTheme.colorScheme
-    val finalBg = when {
-        scheme.isOledFlavor -> Color.Transparent
-        scheme.isClaymorphism -> Color(0xFF242432)
-        else -> scheme.surfaceVariant
-    }
-    val finalBorder = when {
-        scheme.isOledFlavor -> BorderStroke(1.dp, scheme.outlineVariant)
-        scheme.isClaymorphism -> BorderStroke(2.dp, Color.White.copy(alpha = 0.08f))
-        else -> null
-    }
-    val base = this.clip(shape).background(finalBg, shape)
-    return if (finalBorder != null) {
-        base.border(finalBorder, shape)
-    } else {
-        base
-    }
+    return this
+        .clip(shape)
+        .background(RedBgElevated)
 }
-
-@Composable
-fun outlineTextFieldColors() = OutlinedTextFieldDefaults.colors()
 
 @Composable
 fun RedOutlinedTextField(
@@ -171,7 +186,7 @@ fun RedOutlinedTextField(
         minLines = minLines,
         maxLines = maxLines,
         shape = RoundedCornerShape(12.dp),
-        colors = outlineTextFieldColors(),
+        colors = OutlinedTextFieldDefaults.colors(),
     )
 }
 
@@ -207,139 +222,29 @@ fun RedClearableTextField(
     )
 }
 
-
-
-val SansSerifFontFamily = FontFamily.SansSerif
-
-val AppTypography = Typography().run {
-    copy(
-        displayLarge = displayLarge.copy(fontFamily = SansSerifFontFamily),
-        displayMedium = displayMedium.copy(fontFamily = SansSerifFontFamily),
-        displaySmall = displaySmall.copy(fontFamily = SansSerifFontFamily),
-        headlineLarge = headlineLarge.copy(fontFamily = SansSerifFontFamily),
-        headlineMedium = headlineMedium.copy(fontFamily = SansSerifFontFamily),
-        headlineSmall = headlineSmall.copy(fontFamily = SansSerifFontFamily),
-        titleLarge = titleLarge.copy(fontFamily = SansSerifFontFamily),
-        titleMedium = titleMedium.copy(fontFamily = SansSerifFontFamily),
-        titleSmall = titleSmall.copy(fontFamily = SansSerifFontFamily),
-        bodyLarge = bodyLarge.copy(fontFamily = SansSerifFontFamily),
-        bodyMedium = bodyMedium.copy(fontFamily = SansSerifFontFamily),
-        bodySmall = bodySmall.copy(fontFamily = SansSerifFontFamily),
-        labelLarge = labelLarge.copy(fontFamily = SansSerifFontFamily),
-        labelMedium = labelMedium.copy(fontFamily = SansSerifFontFamily),
-        labelSmall = labelSmall.copy(fontFamily = SansSerifFontFamily)
-    )
+@Composable
+fun rememberGradientBrush(): Brush {
+    return Brush.horizontalGradient(listOf(RedAccent, RedGrad1End))
 }
 
 @Composable
-@Preview
+fun outlineTextFieldColors() = OutlinedTextFieldDefaults.colors()
+
+@Composable
 fun Theme(
-    colorScheme: ColorScheme,
+    colorScheme: ColorScheme = RedColorScheme,
     content: @Composable () -> Unit,
 ) {
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = AppTypography,
+        typography = RedTypography,
     ) {
         content()
     }
 }
 
-
-
-val DarkAdwaitaBlackColorScheme = darkColorScheme(
-    primary = Color(0xFF3584E4),
-    onPrimary = Color(0xFFFFFFFF),
-    primaryContainer = Color(0xFF1C71D8),
-    onPrimaryContainer = Color(0xFFFFFFFF),
-    secondary = Color(0xFFB0B0B0),
-    onSecondary = Color(0xFF212121),
-    secondaryContainer = Color(0xFF242424),
-    onSecondaryContainer = Color(0xFFEEEEEE),
-    surface = Color(0xFF101010),
-    background = Color(0xFF000000),
-    onBackground = Color(0xFFFFFFFF),
-    onSurface = Color(0xFFFFFFFF),
-    surfaceVariant = Color(0xFF242424),
-    onSurfaceVariant = Color(0xFFCCCCCC),
-    outline = Color(0xFF555555),
-    outlineVariant = Color(0xFF303030),
-)
-
-val DarkAdwaitaBlackLightBlueColorScheme = darkColorScheme(
-    primary = Color(0xFF62A0EA),
-    onPrimary = Color(0xFF000000),
-    primaryContainer = Color(0xFF3584E4),
-    onPrimaryContainer = Color(0xFFFFFFFF),
-    secondary = Color(0xFFB0B0B0),
-    onSecondary = Color(0xFF212121),
-    secondaryContainer = Color(0xFF242424),
-    onSecondaryContainer = Color(0xFFEEEEEE),
-    surface = Color(0xFF101010),
-    background = Color(0xFF000000),
-    onBackground = Color(0xFFFFFFFF),
-    onSurface = Color(0xFFFFFFFF),
-    surfaceVariant = Color(0xFF242424),
-    onSurfaceVariant = Color(0xFFCCCCCC),
-    outline = Color(0xFF555555),
-    outlineVariant = Color(0xFF303030),
-)
-
-val LightAdwaitaColorScheme = lightColorScheme(
-    primary = Color(0xFF3584E4),
-    onPrimary = Color(0xFFFFFFFF),
-    primaryContainer = Color(0xFFDAECFF),
-    onPrimaryContainer = Color(0xFF002244),
-    secondary = Color(0xFF777777),
-    onSecondary = Color(0xFFFFFFFF),
-    secondaryContainer = Color(0xFFF0f0f0),
-    onSecondaryContainer = Color(0xFF212121),
-    surface = Color(0xFFF6F6F6),
-    background = Color(0xFFFFFFFF),
-    onBackground = Color(0xFF000000),
-    onSurface = Color(0xFF000000),
-    surfaceVariant = Color(0xFFE4E4E4),
-    onSurfaceVariant = Color(0xFF404040),
-    outline = Color(0xFF777777),
-    outlineVariant = Color(0xFFCCCCCC),
-)
-
-val DarkClaymorphismColorScheme = darkColorScheme(
-    primary = Color(0xFF3584E4), // Adwaita blue
-    onPrimary = Color(0xFFFFFFFF),
-    primaryContainer = Color(0xFF1C71D8),
-    onPrimaryContainer = Color(0xFFFFFFFF),
-    secondary = Color(0xFF8E8E9F),
-    onSecondary = Color(0xFF1A1A24),
-    secondaryContainer = Color(0xFF282836),
-    onSecondaryContainer = Color(0xFFE5E5EA),
-    surface = Color(0xFF242432),
-    background = Color(0xFF1A1A24), // Slate dark
-    onBackground = Color(0xFFFFFFFF),
-    onSurface = Color(0xFFFFFFFF),
-    surfaceVariant = Color(0xFF2D2D3E),
-    onSurfaceVariant = Color(0xFFD1D1D6),
-    outline = Color(0xFF48485C),
-    outlineVariant = Color(0xFF333346),
-)
-
-
-
-@Composable
-fun rememberGradientBrush(): Brush {
-    val appSettings = koinInject<AppSettings>()
-    val colorSchemeType by appSettings.colorSchemeFlow.collectAsStateWithLifecycle()
-    return remember(colorSchemeType) {
-        when (colorSchemeType) {
-            AppColorScheme.AdwaitaBlack -> {
-                Brush.horizontalGradient(listOf(Color(0xFF3584E4), Color(0xFF1C71D8)))
-            }
-            AppColorScheme.AdwaitaBlackLightBlue -> {
-                Brush.horizontalGradient(listOf(Color(0xFF62A0EA), Color(0xFF3584E4)))
-            }
-            AppColorScheme.Claymorphism -> {
-                Brush.horizontalGradient(listOf(Color(0xFF3584E4), Color(0xFF1C71D8)))
-            }
-        }
-    }
-}
+// Backward-compat aliases for App.kt (will remove when App.kt is rewritten in Phase 2)
+val DarkAdwaitaBlackColorScheme: ColorScheme get() = RedColorScheme
+val DarkAdwaitaBlackLightBlueColorScheme: ColorScheme get() = RedColorScheme
+val LightAdwaitaColorScheme: ColorScheme get() = RedColorScheme
+val DarkClaymorphismColorScheme: ColorScheme get() = RedColorScheme

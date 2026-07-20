@@ -1,6 +1,6 @@
 # Chat & Conversations
 
-**Last verified:** 2026-05-28
+**Last verified:** 2026-07-19
 
 Red's chat system manages the message history, conversation persistence, file attachments, and speech output. Conversations are service-independent — switching providers does not affect which conversation is loaded or restored. Multiple conversations are persisted and browsable via a history sheet.
 
@@ -109,12 +109,21 @@ Multiple files can be attached to a single prompt. Each file is added one at a t
 
 ## UI Elements
 
-- **Top bar**: New Chat, Chat History, a Sandbox toggle (Android only, shown between History and TTS when the sandbox feature is available on the device), TTS toggle, Settings (on mobile; on non-mobile, Settings is in the navigation tab bar)
-- **Scroll to bottom**: a small floating action button (down arrow) appears when the user has scrolled up past the latest messages; tapping it animates back to the bottom
-- **Messages**: user (right-aligned, with optional image preview), assistant (Markdown-rendered + action buttons), tool executing (spinner), loading indicator, error with retry. When the fallback chain answered with an alternate service rather than the user's selected one, a small "Answered by …" label is shown under the assistant message naming the service that produced the response
-- **Input**: text field, send/stop button, attachment button, file chip
-- **Empty state**: animated logo + welcome message
-- **Drag-and-drop**: supported for file attachments
+### Desktop layout
+- **Top bar**: New Chat, Chat History, a Sandbox toggle (Android only), TTS toggle, Settings
+- **Sidebar**: left-panel conversation list with search, rename/star/delete via right-click context menu and long-press context menu, plus settings and notifications navigation
+
+### Mobile layout
+- **Bottom navigation**: Chats tab lists all conversations with search, filter pills (All / Starred), and a floating action button for new chat
+- **Conversation overlay**: slides in from the right when a chat is selected; back button returns to the tab shell
+- **Message list**: user messages (left-aligned with avatar), assistant (Markdown-rendered), tool executing (pulsing indicator), loading (thinking dots), error with retry
+- **Composer**: text field + send/stop button, file attachment, service selector
+- **Empty state**: icon + "No conversations yet" message when no history exists
+
+### Shared across layouts
+- **Scroll to bottom**: a small floating action button (down arrow) appears when scrolled up past the latest messages
+- **Input**: text field, send/stop button, attachment button, file chip row
+- **Drag-and-drop**: supported for file attachments (desktop)
 - **History sheet**: bottom sheet listing saved conversations with title, date, active highlight, and delete
 
 ## Key Files
@@ -127,7 +136,12 @@ Multiple files can be attached to a single prompt. Each file is added one at a t
 | `composeApp/src/commonMain/.../data/RemoteDataRepository.kt` | History management, conversation save/restore/delete, title derivation, message sending |
 | `composeApp/src/commonMain/.../ui/chat/ChatViewModel.kt` | Chat UI state, send/retry/regenerate/cancel/loadConversation/deleteConversation actions |
 | `composeApp/src/commonMain/.../ui/chat/ChatScreen.kt` | Chat UI composables, history sheet and heartbeat banner wiring |
+| `composeApp/src/commonMain/.../ui/chat/ChatListTab.kt` | Mobile chat list tab with search, filter pills, FAB |
 | `composeApp/src/commonMain/.../ui/chat/composables/ChatHistorySheet.kt` | Bottom sheet listing saved conversations |
 | `composeApp/src/commonMain/.../ui/chat/composables/HeartbeatBanner.kt` | Dismissable banner for heartbeat notifications |
 | `composeApp/src/commonMain/.../ui/chat/composables/TopBar.kt` | Top bar with new chat, history, TTS, and settings icons |
 | `composeApp/src/commonMain/.../ui/chat/composables/QuestionInput.kt` | Text input with send/stop button |
+| `composeApp/src/commonMain/.../ui/navigation/AppShell.kt` | Mobile shell: pager, bottom nav, chat overlay |
+| `composeApp/src/commonMain/.../ui/Theme.kt` | Single dark color scheme (RedColorScheme), typography, backward-compat aliases |
+| `composeApp/src/commonMain/.../ui/foundation/RedSearchField.kt` | Chat list search bar |
+| `composeApp/src/commonMain/.../ui/foundation/EmptyState.kt` | Reusable empty state for tabs |
