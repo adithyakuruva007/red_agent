@@ -45,6 +45,9 @@ fun ReferenceChatScreen(
         chatState.savedConversations.find { it.id == chatState.currentConversationId }?.title ?: ""
     }
 
+    var showContextDialog by remember { androidx.compose.runtime.mutableStateOf(false) }
+    var customAvatarLabel by remember(chatState.currentConversationId) { androidx.compose.runtime.mutableStateOf<String?>(null) }
+
     val onCopyMessage: () -> Unit = {
         scope.launch {
             snackbarHostState.showSnackbar("Copied to clipboard")
@@ -63,6 +66,16 @@ fun ReferenceChatScreen(
                 title = conversationTitle,
                 isLoading = chatState.isLoading,
                 onBack = onBack,
+                onRename = { newTitle ->
+                    chatState.currentConversationId?.let { convId ->
+                        scope.launch {
+                            chatState.actions.renameConversation(convId, newTitle)
+                        }
+                    }
+                },
+                onOpenContext = { showContextDialog = true },
+                customAvatarLabel = customAvatarLabel,
+                onUpdateAvatar = { customAvatarLabel = it },
             )
 
             Box(
@@ -103,9 +116,8 @@ fun ReferenceChatScreen(
 
                             History.Role.ASSISTANT -> {
                                 if (entry.content.isNotEmpty() && !entry.isThinking) {
-                                    ReferenceAgentBubbleWithAvatar(
+                                    ReferenceAgentBubble(
                                         content = entry.content,
-                                        avatarLabel = conversationTitle,
                                         onCopy = onCopyMessage,
                                     )
                                 }
@@ -158,5 +170,11 @@ fun ReferenceChatScreen(
             hostState = snackbarHostState,
             modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 80.dp),
         )
+
+        if (showContextDialog) {
+            ReferenceContextDialog(
+                onDismissRequest = { showContextDialog = false },
+            )
+        }
     }
 }

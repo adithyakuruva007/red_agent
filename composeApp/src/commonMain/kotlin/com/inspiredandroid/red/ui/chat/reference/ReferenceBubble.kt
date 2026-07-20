@@ -81,6 +81,7 @@ fun ReferenceAgentBubble(
     onCopy: (() -> Unit)? = null,
 ) {
     val clipboardManager = LocalClipboardManager.current
+    val document = androidx.compose.runtime.remember(content) { com.inspiredandroid.red.ui.markdown.parseMarkdown(content) }
 
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -88,7 +89,7 @@ fun ReferenceAgentBubble(
     ) {
         Box(
             modifier = Modifier
-                .widthIn(max = 304.dp)
+                .fillMaxWidth(0.92f)
                 .clip(RoundedCornerShape(18.dp, 18.dp, 18.dp, 5.dp))
                 .background(RedBgPanel)
                 .border(1.dp, RedBorderHairline, RoundedCornerShape(18.dp, 18.dp, 18.dp, 5.dp))
@@ -103,12 +104,7 @@ fun ReferenceAgentBubble(
                 .padding(horizontal = 13.dp, vertical = 10.dp),
         ) {
             SelectionContainer {
-                Text(
-                    text = content,
-                    color = RedTextPrimary,
-                    fontSize = 14.5.sp,
-                    lineHeight = 20.sp,
-                )
+                com.inspiredandroid.red.ui.markdown.MarkdownContent(document = document)
             }
         }
     }

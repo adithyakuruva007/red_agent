@@ -76,6 +76,7 @@ fun ChatListTab(
     val conversations = remember(state.savedConversations) {
         state.savedConversations.toImmutableList()
     }
+    var showContextDialog by remember { mutableStateOf(false) }
 
     Column(modifier = modifier.fillMaxSize().background(RedBgDeep)) {
         Row(
@@ -92,20 +93,23 @@ fun ChatListTab(
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
             )
-            IconButton(
-                onClick = { onOpenChat(null) },
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .background(RedAccent)
-                    .handCursor(),
+            androidx.compose.material3.Button(
+                onClick = { showContextDialog = true },
+                shape = RoundedCornerShape(10.dp),
+                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                    containerColor = Color.White.copy(alpha = 0.08f),
+                    contentColor = RedTextPrimary,
+                ),
+                modifier = Modifier.handCursor(),
             ) {
                 Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "New Chat",
-                    tint = Color.White,
-                    modifier = Modifier.size(20.dp),
+                    imageVector = androidx.compose.material.icons.filled.Folder,
+                    contentDescription = "Context",
+                    tint = RedAccent,
+                    modifier = Modifier.size(18.dp),
                 )
+                Spacer(Modifier.width(6.dp))
+                Text("Context", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
             }
         }
 
@@ -171,9 +175,13 @@ fun ChatListTab(
                 imageVector = Icons.Default.Add,
                 contentDescription = "New chat",
                 tint = Color.White,
-                modifier = Modifier.size(28.dp),
-            )
         }
+    }
+
+    if (showContextDialog) {
+        com.inspiredandroid.red.ui.chat.reference.ReferenceContextDialog(
+            onDismissRequest = { showContextDialog = false },
+        )
     }
 }
 
