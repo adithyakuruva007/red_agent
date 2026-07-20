@@ -36,6 +36,8 @@ import com.inspiredandroid.red.ui.RedTextSecondary
 import com.inspiredandroid.red.ui.foundation.ThinkingDots
 import com.inspiredandroid.red.ui.handCursor
 
+import androidx.compose.foundation.layout.statusBarsPadding
+
 @Composable
 fun ReferenceHeader(
     title: String,
@@ -47,7 +49,8 @@ fun ReferenceHeader(
         modifier = modifier
             .fillMaxWidth()
             .background(RedBgDeep)
-            .padding(start = 4.dp, end = 4.dp, top = 8.dp, bottom = 12.dp),
+            .statusBarsPadding()
+            .padding(start = 4.dp, end = 4.dp, top = 4.dp, bottom = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         IconButton(

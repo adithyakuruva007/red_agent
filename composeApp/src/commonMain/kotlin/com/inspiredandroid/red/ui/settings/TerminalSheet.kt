@@ -208,11 +208,7 @@ fun TerminalContent(
         }
     }
 
-    LaunchedEffect(Unit) {
-        if (sandboxController != null) {
-            focusRequester.requestFocus()
-        }
-    }
+
 
     // Jump to the tail whenever the session changes. The size-based auto-scroll
     // below covers per-append scrolling — keying this effect on outputLines too

@@ -19,6 +19,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -129,7 +131,7 @@ fun QuestionInput(
     val appSettings: AppSettings = koinInject()
     val gradientBrush = rememberGradientBrush()
 
-    Column(modifier = modifier) {
+    Column(modifier = modifier.navigationBarsPadding().imePadding()) {
         // Slash autocomplete: shown when the user is typing the first token and it starts
         // with `/`. Selecting an entry rewrites the first token to the canonical skill id
         // so the ViewModel can match it at send time.
@@ -161,7 +163,7 @@ fun QuestionInput(
 
         fun submitQuestion() {
             val text = textState.text
-            if (text.isNotBlank()) {
+            if (text.trim().isNotBlank()) {
                 ask(text.trim())
                 onTextStateChange(TextFieldValue(""))
             }
@@ -205,7 +207,7 @@ fun QuestionInput(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 12.dp, end = 12.dp, top = 2.dp, bottom = 4.dp)
-                .redInputSurface(isFocused = isFocused, shape = RoundedCornerShape(6.dp))
+                .redInputSurface(isFocused = isFocused, shape = RoundedCornerShape(24.dp))
         ) {
             // Prompt input text field (transparent)
             TextField(
@@ -218,7 +220,7 @@ fun QuestionInput(
                     .fillMaxWidth()
                     .heightIn(min = 32.dp, max = 80.dp)
                     .onPreviewKeyEvent { event ->
-                        if (currentPlatform !is Platform.Mobile && event.key.keyCode == Key.Enter.keyCode && event.type == KeyEventType.KeyDown) {
+                        if (event.key.keyCode == Key.Enter.keyCode && event.type == KeyEventType.KeyDown) {
                             if (event.isShiftPressed) {
                                 val currentText = textState.text
                                 val selection = textState.selection
@@ -256,13 +258,9 @@ fun QuestionInput(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 },
-                keyboardActions = if (currentPlatform !is Platform.Mobile) {
-                    KeyboardActions(onSend = { submitQuestion() })
-                } else {
-                    KeyboardActions()
-                },
+                keyboardActions = KeyboardActions(onSend = { submitQuestion() }),
                 keyboardOptions = KeyboardOptions(
-                    imeAction = if (currentPlatform is Platform.Mobile) ImeAction.Default else ImeAction.Send,
+                    imeAction = ImeAction.Send,
                 ),
             )
 

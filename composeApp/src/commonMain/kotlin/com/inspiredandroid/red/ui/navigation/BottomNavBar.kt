@@ -109,15 +109,7 @@ fun BottomNavBar(
                                     )
                                 }
                             }
-                            NavTab.Sandbox -> if (sandboxOnline) {
-                                Box(
-                                    modifier = Modifier
-                                        .align(Alignment.TopEnd)
-                                        .offset { IntOffset(8, -2) }
-                                        .size(7.dp)
-                                        .background(RedOnline, RoundedCornerShape(3.5.dp)),
-                                )
-                            }
+                            NavTab.Sandbox -> {}
                             NavTab.Alerts -> if (alertBadgeCount > 0) {
                                 Box(
                                     modifier = Modifier

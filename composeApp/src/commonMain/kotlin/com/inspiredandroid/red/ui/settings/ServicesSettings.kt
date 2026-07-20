@@ -452,9 +452,7 @@ private fun ServiceSettings(
 
     Spacer(Modifier.height(16.dp))
 
-    if (connectionStatus == ConnectionStatus.Connected || models.isNotEmpty()) {
-        ModelSelection(selectedModel, models, onSelectModel)
-    }
+    ModelSelection(selectedModel, models, onSelectModel)
 }
 
 @Composable
@@ -535,9 +533,7 @@ private fun OpenAICompatibleSettings(
 
     Spacer(Modifier.height(16.dp))
 
-    if (connectionStatus == ConnectionStatus.Connected) {
-        ModelSelection(selectedModel, models, onSelectModel)
-    }
+    ModelSelection(selectedModel, models, onSelectModel)
 }
 
 @Composable

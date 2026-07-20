@@ -257,12 +257,15 @@ class SettingsViewModel(
     private fun buildConfiguredServiceEntries(): List<ConfiguredServiceEntry> = dataRepository.getConfiguredServiceInstances().map { instance ->
         val service = Service.fromId(instance.serviceId)
         val models = dataRepository.getInstanceModels(instance.instanceId, service).value
+        val selectedModelId = dataRepository.getInstanceSelectedModelId(instance.instanceId, service)
+        val selectedModel = models.firstOrNull { it.id == selectedModelId || it.isSelected }
+            ?: if (selectedModelId.isNotBlank()) SettingsModel(id = selectedModelId, isSelected = true) else null
         ConfiguredServiceEntry(
             instanceId = instance.instanceId,
             service = service,
             apiKey = dataRepository.getInstanceApiKey(instance.instanceId),
             baseUrl = dataRepository.getInstanceBaseUrl(instance.instanceId, service),
-            selectedModel = models.firstOrNull { it.isSelected },
+            selectedModel = selectedModel,
             models = models.toImmutableList(),
         )
     }
@@ -394,7 +397,7 @@ class SettingsViewModel(
     private fun onSelectModel(instanceId: String, modelId: String) {
         val entry = _state.value.configuredServices.find { it.instanceId == instanceId } ?: return
         dataRepository.updateInstanceSelectedModel(instanceId, entry.service, modelId)
-        refreshInstanceModels(instanceId)
+        refreshServiceList()
     }
 
     private fun onSaveSoul(text: String) {

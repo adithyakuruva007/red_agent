@@ -77,14 +77,6 @@ internal fun GeneralContent(uiState: SettingsUiState, actions: SettingsActions) 
                             isDynamicUiEnabled = uiState.isDynamicUiEnabled,
                             onToggleDynamicUi = actions.onToggleDynamicUi,
                         )
-                    }
-
-                    SettingsCard {
-                        ColorSchemePicker(
-                            colorScheme = colorScheme,
-                            onChangeColorScheme = { appSettings.setColorScheme(it) },
-                        )
-                    }
                 }
                 Column(
                     modifier = Modifier.weight(1f),
@@ -124,12 +116,6 @@ internal fun GeneralContent(uiState: SettingsUiState, actions: SettingsActions) 
                     )
                 }
 
-                SettingsCard {
-                    ColorSchemePicker(
-                        colorScheme = colorScheme,
-                        onChangeColorScheme = { appSettings.setColorScheme(it) },
-                    )
-                }
                 if (uiState.showUiScale) {
                     SettingsCard {
                         UiScaleSection(
@@ -216,93 +202,5 @@ private fun UiScaleSection(
     }
 }
 
-@Composable
-private fun ColorSchemePicker(
-    colorScheme: AppColorScheme,
-    onChangeColorScheme: (AppColorScheme) -> Unit,
-) {
-    val options = listOf(
-        AppColorScheme.AdwaitaBlack to "Adwaita Black",
-        AppColorScheme.AdwaitaBlackLightBlue to "Adwaita Black (Light Blue)",
-        AppColorScheme.Claymorphism to "Claymorphism (Dark Adwaita)",
-    )
-    val selectedLabel = options.first { it.first == colorScheme }.second
-    var expanded by remember { mutableStateOf(false) }
 
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = "Color Scheme",
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onBackground,
-        )
-        Text(
-            text = "Choose the application color palette",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(top = 4.dp, bottom = 12.dp),
-        )
-        Box(modifier = Modifier.fillMaxWidth()) {
-            RedOutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
-                value = selectedLabel,
-                onValueChange = {},
-                readOnly = true,
-                trailingIcon = {
-                    Icon(
-                        modifier = Modifier.handCursor(),
-                        imageVector = vectorResource(Res.drawable.ic_arrow_drop_down),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onBackground,
-                    )
-                },
-            )
-            Box(
-                modifier = Modifier
-                    .matchParentSize()
-                    .handCursor()
-                    .clickable { expanded = true },
-            )
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                shape = RoundedCornerShape(16.dp),
-            ) {
-                options.forEach { (scheme, label) ->
-                    val isSelected = scheme == colorScheme
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                text = label,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = if (isSelected) {
-                                    MaterialTheme.colorScheme.onPrimaryContainer
-                                } else {
-                                    MaterialTheme.colorScheme.onSurface
-                                },
-                            )
-                        },
-                        onClick = {
-                            expanded = false
-                            onChangeColorScheme(scheme)
-                        },
-                        modifier = Modifier
-                            .handCursor()
-                            .then(
-                                if (isSelected) {
-                                    Modifier
-                                        .padding(horizontal = 4.dp)
-                                        .background(
-                                            MaterialTheme.colorScheme.primaryContainer,
-                                            RoundedCornerShape(8.dp),
-                                        )
-                                } else {
-                                    Modifier
-                                },
-                            ),
-                    )
-                }
-            }
-        }
-    }
-}
 

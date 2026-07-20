@@ -36,3 +36,8 @@ GoogleService-Info.plist
 releases/
 *.apk
 *.deb
+
+# Local reference directories
+Red original/
+Red original
+

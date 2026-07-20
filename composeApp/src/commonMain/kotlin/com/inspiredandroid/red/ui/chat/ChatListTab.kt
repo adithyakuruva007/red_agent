@@ -21,13 +21,22 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.inspiredandroid.red.ui.RedOutlinedTextField
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -54,6 +63,9 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.shape.CircleShape
+
 @Composable
 fun ChatListTab(
     onOpenChat: (String?) -> Unit,
@@ -66,6 +78,37 @@ fun ChatListTab(
     }
 
     Column(modifier = modifier.fillMaxSize().background(RedBgDeep)) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .statusBarsPadding()
+                .padding(horizontal = 18.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text(
+                text = "Chats",
+                color = RedTextPrimary,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+            )
+            IconButton(
+                onClick = { onOpenChat(null) },
+                modifier = Modifier
+                    .size(36.dp)
+                    .clip(CircleShape)
+                    .background(RedAccent)
+                    .handCursor(),
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "New Chat",
+                    tint = Color.White,
+                    modifier = Modifier.size(20.dp),
+                )
+            }
+        }
+
         Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
             if (conversations.isEmpty()) {
                 EmptyState(
@@ -97,6 +140,7 @@ fun ChatListTab(
                                 onOpenChat(conv.id)
                             },
                             onDelete = { state.actions.deleteConversation(conv.id) },
+                            onRename = { newTitle -> state.actions.renameConversation(conv.id, newTitle) },
                         )
                     }
                 }
@@ -139,8 +183,12 @@ private fun ConversationRow(
     isActive: Boolean,
     onClick: () -> Unit,
     onDelete: () -> Unit,
+    onRename: (String) -> Unit,
 ) {
     val bg = if (isActive) RedBgElevated else RedBgPanel
+    var menuExpanded by remember { mutableStateOf(false) }
+    var showRenameDialog by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     Row(
         modifier = Modifier
@@ -202,16 +250,116 @@ private fun ConversationRow(
             )
         }
 
-        IconButton(
-            onClick = onDelete,
-            modifier = Modifier.size(32.dp).handCursor(),
-        ) {
-            Icon(
-                imageVector = Icons.Default.Delete,
-                contentDescription = "Delete",
-                tint = RedTextTertiary,
-                modifier = Modifier.size(18.dp),
-            )
+        // 3 Dots Menu Button
+        Box {
+            IconButton(
+                onClick = { menuExpanded = true },
+                modifier = Modifier.size(32.dp).handCursor(),
+            ) {
+                Icon(
+                    imageVector = Icons.Default.MoreVert,
+                    contentDescription = "Options",
+                    tint = RedTextTertiary,
+                    modifier = Modifier.size(20.dp),
+                )
+            }
+
+            DropdownMenu(
+                expanded = menuExpanded,
+                onDismissRequest = { menuExpanded = false },
+                shape = RoundedCornerShape(12.dp),
+            ) {
+                DropdownMenuItem(
+                    text = { Text("Rename", color = RedTextPrimary) },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = "Rename",
+                            tint = RedTextSecondary,
+                            modifier = Modifier.size(18.dp),
+                        )
+                    },
+                    onClick = {
+                        menuExpanded = false
+                        showRenameDialog = true
+                    },
+                    modifier = Modifier.handCursor(),
+                )
+                DropdownMenuItem(
+                    text = { Text("Delete", color = MaterialTheme.colorScheme.error) },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "Delete",
+                            tint = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.size(18.dp),
+                        )
+                    },
+                    onClick = {
+                        menuExpanded = false
+                        showDeleteDialog = true
+                    },
+                    modifier = Modifier.handCursor(),
+                )
+            }
         }
+    }
+
+    // Rename Modal Dialog
+    if (showRenameDialog) {
+        var newTitle by remember { mutableStateOf(conversation.title) }
+        AlertDialog(
+            onDismissRequest = { showRenameDialog = false },
+            title = { Text("Rename Conversation") },
+            text = {
+                RedOutlinedTextField(
+                    value = newTitle,
+                    onValueChange = { newTitle = it },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        if (newTitle.trim().isNotBlank()) {
+                            onRename(newTitle.trim())
+                        }
+                        showRenameDialog = false
+                    },
+                ) {
+                    Text("Save")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showRenameDialog = false }) {
+                    Text("Cancel")
+                }
+            },
+        )
+    }
+
+    // Delete Confirmation Modal Dialog
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Delete Conversation") },
+            text = { Text("Are you sure you want to delete this conversation? This action cannot be undone.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteDialog = false
+                        onDelete()
+                    },
+                ) {
+                    Text("Delete", color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text("Cancel")
+                }
+            },
+        )
     }
 }
