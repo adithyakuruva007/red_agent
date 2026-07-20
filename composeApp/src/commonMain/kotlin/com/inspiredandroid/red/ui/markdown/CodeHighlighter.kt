@@ -21,9 +21,9 @@ internal data class HighlightColors(
 )
 
 internal fun codeHighlightColors(scheme: ColorScheme): HighlightColors = HighlightColors(
-    keyword = scheme.tertiary,
-    literal = scheme.secondary,
-    comment = scheme.outline,
+    keyword = Color(0xFFFF79C6),
+    literal = Color(0xFFF1FA8C),
+    comment = Color(0xFF7EC699),
 )
 
 private val KOTLIN_KEYWORDS = setOf(

@@ -91,9 +91,8 @@ fun ReferenceComposer(
                     width = 1.dp,
                     brush = Brush.horizontalGradient(
                         listOf(
-                            RedAccent.copy(alpha = 0.4f),
-                            Color(0xFF6B4CFF).copy(alpha = 0.25f),
-                            RedBorderHairline,
+                            RedAccent,
+                            Color(0xFF3E5FCB),
                         ),
                     ),
                     shape = RoundedCornerShape(16.dp),
@@ -107,16 +106,16 @@ fun ReferenceComposer(
                 IconButton(
                     onClick = { showAttachMenu = true },
                     modifier = Modifier
-                        .size(36.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(Color.White.copy(alpha = 0.05f))
+                        .size(28.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color.White.copy(alpha = 0.06f))
                         .handCursor(),
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
                         contentDescription = "Add attachment",
                         tint = RedTextSecondary,
-                        modifier = Modifier.size(22.dp),
+                        modifier = Modifier.size(16.dp),
                     )
                 }
 
@@ -171,7 +170,7 @@ fun ReferenceComposer(
             Box(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(horizontal = 6.dp, vertical = 6.dp),
+                    .padding(horizontal = 6.dp, vertical = 4.dp),
             ) {
                 if (text.isEmpty()) {
                     Text(
@@ -213,7 +212,7 @@ fun ReferenceComposer(
                 )
             }
 
-            // Action Button (Send / Square Cancel Stop - Soft Square & Matching Color Scheme)
+            // Action Button (Send / Square Cancel Stop - Soft Square & Signature Blue Color Scheme)
             IconButton(
                 onClick = {
                     if (isLoading) {
@@ -224,13 +223,13 @@ fun ReferenceComposer(
                 },
                 enabled = isLoading || text.trim().isNotBlank(),
                 modifier = Modifier
-                    .size(38.dp)
-                    .clip(RoundedCornerShape(10.dp))
+                    .size(32.dp)
+                    .clip(RoundedCornerShape(8.dp))
                     .background(
                         if (isLoading || text.trim().isNotBlank()) {
-                            Brush.linearGradient(listOf(RedAccent, Color(0xFF5E3FCB)))
+                            Brush.linearGradient(listOf(RedAccent, Color(0xFF3E5FCB)))
                         } else {
-                            SolidColor(Color.White.copy(alpha = 0.1f))
+                            SolidColor(Color.White.copy(alpha = 0.08f))
                         },
                     )
                     .handCursor(),
@@ -239,7 +238,7 @@ fun ReferenceComposer(
                     imageVector = if (isLoading) Icons.Default.Stop else Icons.AutoMirrored.Filled.Send,
                     contentDescription = if (isLoading) "Cancel" else "Send",
                     tint = if (isLoading || text.trim().isNotBlank()) Color.White else RedTextTertiary,
-                    modifier = Modifier.size(if (isLoading) 20.dp else 18.dp),
+                    modifier = Modifier.size(16.dp),
                 )
             }
         }

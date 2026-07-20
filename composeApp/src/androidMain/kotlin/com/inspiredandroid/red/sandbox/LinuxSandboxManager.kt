@@ -66,8 +66,16 @@ class LinuxSandboxManager(
 
     val tmpPath: String get() = File(sandboxDir, "tmp").absolutePath
 
-    // Run proot directly from nativeLibraryDir where Android grants execute permission
-    val prootPath: String get() = File(context.applicationInfo.nativeLibraryDir, "libproot.so").absolutePath
+    // Run proot directly from nativeLibraryDir or fallback sandboxDir
+    val prootPath: String
+        get() {
+            val primary = File(context.applicationInfo.nativeLibraryDir, "libproot.so")
+            if (primary.exists()) return primary.absolutePath
+            val fallback = File(sandboxDir, "libproot.so")
+            if (fallback.exists()) return fallback.absolutePath
+            return primary.absolutePath
+        }
+
     val nativeLibDir: String get() = context.applicationInfo.nativeLibraryDir
 
     private val downloader by lazy { RootfsDownloader(HttpClient(Android)) }
@@ -79,7 +87,10 @@ class LinuxSandboxManager(
     private fun checkExistingInstallation() {
         val rootfs = File(sandboxDir, "rootfs")
         val proot = File(prootPath)
-        if (rootfs.isDirectory && proot.exists() && proot.canExecute()) {
+        if (rootfs.isDirectory && proot.exists()) {
+            if (!proot.canExecute()) {
+                proot.setExecutable(true)
+            }
             _state.value = SandboxState.Ready
         }
     }
@@ -125,19 +136,32 @@ class LinuxSandboxManager(
     private suspend fun setupInternal() {
         val arch = getLinuxArch()
 
-        // Verify proot is available in nativeLibraryDir
-        val proot = File(prootPath)
+        // Create directories.
+        sandboxDir.mkdirs()
+        File(sandboxDir, "tmp").mkdirs()
+
+        // Verify proot is available in nativeLibraryDir or copy fallback
+        var proot = File(prootPath)
+        if (!proot.exists()) {
+            val nativeProot = File(nativeLibDir, "libproot.so")
+            val fallbackProot = File(sandboxDir, "libproot.so")
+            if (nativeProot.exists()) {
+                nativeProot.copyTo(fallbackProot, overwrite = true)
+                fallbackProot.setExecutable(true)
+                proot = fallbackProot
+            }
+        }
+
+        if (proot.exists() && !proot.canExecute()) {
+            proot.setExecutable(true)
+        }
+
         if (!proot.exists()) {
             throw IllegalStateException(
                 "Proot binary not found at $prootPath. " +
                     "nativeLibraryDir contents: ${File(nativeLibDir).listFiles()?.map { it.name } ?: "empty"}",
             )
         }
-
-        // Create directories. `homePath` getter creates the externally-visible
-        // sandbox-home dir on access, so we only need to ensure sandboxDir + tmp.
-        sandboxDir.mkdirs()
-        File(sandboxDir, "tmp").mkdirs()
 
         // Copy libtalloc with correct soname (Android strips .so.2 suffix in jniLibs)
         copyLibtalloc()

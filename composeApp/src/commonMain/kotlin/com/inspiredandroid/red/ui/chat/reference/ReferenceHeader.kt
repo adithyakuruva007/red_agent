@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -56,6 +57,7 @@ fun ReferenceHeader(
     onOpenContext: () -> Unit = {},
     customAvatarLabel: String? = null,
     onUpdateAvatar: (String) -> Unit = {},
+    onPickAvatarFile: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     var showMenu by remember { mutableStateOf(false) }
@@ -87,6 +89,11 @@ fun ReferenceHeader(
             )
         }
 
+        val isImagePath = customAvatarLabel?.let { it.contains("/") || it.startsWith("file:") } == true
+        val displayAvatarLabel = (customAvatarLabel?.takeIf { !isImagePath && it.isNotBlank() }
+            ?: title.firstOrNull()?.toString()
+            ?: "R").uppercase()
+
         Box(
             modifier = Modifier
                 .size(38.dp)
@@ -96,12 +103,21 @@ fun ReferenceHeader(
                 ),
             contentAlignment = Alignment.Center,
         ) {
-            Text(
-                text = displayAvatarLabel,
-                color = Color.White,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
-            )
+            if (isImagePath) {
+                coil3.compose.AsyncImage(
+                    model = customAvatarLabel,
+                    contentDescription = "Avatar Picture",
+                    contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            } else {
+                Text(
+                    text = displayAvatarLabel,
+                    color = Color.White,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
         }
 
         Spacer(Modifier.width(10.dp))
@@ -250,13 +266,37 @@ fun ReferenceHeader(
             onDismissRequest = { showAvatarDialog = false },
             title = { Text("Custom Profile Pic / Avatar", color = RedTextPrimary) },
             text = {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Enter custom initial or label for this chat avatar:", color = RedTextSecondary, fontSize = 13.sp)
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text("Select a photo from your device or enter custom initials/label:", color = RedTextSecondary, fontSize = 13.sp)
+                    
+                    androidx.compose.material3.Button(
+                        onClick = {
+                            showAvatarDialog = false
+                            onPickAvatarFile()
+                        },
+                        shape = RoundedCornerShape(10.dp),
+                        colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                            containerColor = RedAccent,
+                            contentColor = Color.White,
+                        ),
+                        modifier = Modifier.fillMaxWidth().handCursor(),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.AccountCircle,
+                            contentDescription = "Choose Picture",
+                            modifier = Modifier.size(18.dp),
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text("Choose Picture File", fontSize = 13.5.sp, fontWeight = FontWeight.SemiBold)
+                    }
+
+                    Text("Or enter text label:", color = RedTextSecondary, fontSize = 12.sp)
+
                     OutlinedTextField(
                         value = avatarText,
                         onValueChange = { avatarText = it },
                         singleLine = true,
-                        label = { Text("Avatar Label") },
+                        label = { Text("Avatar Label / Path") },
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }

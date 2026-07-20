@@ -31,6 +31,10 @@ import com.inspiredandroid.red.ui.RedBorderHairline
 import com.inspiredandroid.red.ui.RedTextTertiary
 import com.inspiredandroid.red.ui.chat.ChatUiState
 import com.inspiredandroid.red.ui.chat.History
+import com.inspiredandroid.red.getPlatformPath
+import io.github.vinceglb.filekit.dialogs.FileKitType
+import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
+import io.github.vinceglb.filekit.name
 import kotlinx.coroutines.launch
 
 @Composable
@@ -48,6 +52,15 @@ fun ReferenceChatScreen(
 
     var showContextDialog by remember { androidx.compose.runtime.mutableStateOf(false) }
     var customAvatarLabel by remember(chatState.currentConversationId) { androidx.compose.runtime.mutableStateOf<String?>(null) }
+
+    val avatarPickerLauncher = rememberFilePickerLauncher(
+        type = FileKitType.Image,
+    ) { file ->
+        val selectedPath = file?.getPlatformPath() ?: file?.name
+        if (selectedPath != null) {
+            customAvatarLabel = selectedPath
+        }
+    }
 
     val onCopyMessage: () -> Unit = {
         scope.launch {
@@ -77,6 +90,7 @@ fun ReferenceChatScreen(
                 onOpenContext = { showContextDialog = true },
                 customAvatarLabel = customAvatarLabel,
                 onUpdateAvatar = { customAvatarLabel = it },
+                onPickAvatarFile = { avatarPickerLauncher.launch() },
             )
 
             Box(
