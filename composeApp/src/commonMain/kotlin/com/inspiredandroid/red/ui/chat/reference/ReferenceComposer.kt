@@ -10,20 +10,27 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AttachFile
-import androidx.compose.material.icons.filled.Mic
-import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.InsertDriveFile
+import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -58,6 +65,8 @@ fun ReferenceComposer(
     isLoading: Boolean,
     modifier: Modifier = Modifier,
 ) {
+    var showAttachMenu by remember { mutableStateOf(false) }
+
     val handleSend = {
         if (text.trim().isNotBlank() && !isLoading) {
             onSend()
@@ -72,11 +81,11 @@ fun ReferenceComposer(
             .imePadding()
             .padding(horizontal = 14.dp, vertical = 8.dp),
     ) {
-        // Floating Bubbly Container
+        // Soft Rectangular Container
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(26.dp))
+                .clip(RoundedCornerShape(16.dp))
                 .background(RedBgPanel)
                 .border(
                     width = 1.dp,
@@ -87,27 +96,75 @@ fun ReferenceComposer(
                             RedBorderHairline,
                         ),
                     ),
-                    shape = RoundedCornerShape(26.dp),
+                    shape = RoundedCornerShape(16.dp),
                 )
                 .padding(horizontal = 8.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(6.dp),
         ) {
-            // Bubbly Attach Button
-            IconButton(
-                onClick = {},
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .background(Color.White.copy(alpha = 0.05f))
-                    .handCursor(),
-            ) {
-                Icon(
-                    imageVector = Icons.Default.AttachFile,
-                    contentDescription = "Attach",
-                    tint = RedTextSecondary,
-                    modifier = Modifier.size(19.dp),
-                )
+            // Plus Button (+) with Attachment Options Menu
+            Box {
+                IconButton(
+                    onClick = { showAttachMenu = true },
+                    modifier = Modifier
+                        .size(36.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(Color.White.copy(alpha = 0.05f))
+                        .handCursor(),
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Add attachment",
+                        tint = RedTextSecondary,
+                        modifier = Modifier.size(22.dp),
+                    )
+                }
+
+                DropdownMenu(
+                    expanded = showAttachMenu,
+                    onDismissRequest = { showAttachMenu = false },
+                    shape = RoundedCornerShape(12.dp),
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("Files", color = RedTextPrimary) },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.InsertDriveFile,
+                                contentDescription = "Files",
+                                tint = RedTextSecondary,
+                                modifier = Modifier.size(18.dp),
+                            )
+                        },
+                        onClick = { showAttachMenu = false },
+                        modifier = Modifier.handCursor(),
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Camera", color = RedTextPrimary) },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.PhotoCamera,
+                                contentDescription = "Camera",
+                                tint = RedTextSecondary,
+                                modifier = Modifier.size(18.dp),
+                            )
+                        },
+                        onClick = { showAttachMenu = false },
+                        modifier = Modifier.handCursor(),
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Photos", color = RedTextPrimary) },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Image,
+                                contentDescription = "Photos",
+                                tint = RedTextSecondary,
+                                modifier = Modifier.size(18.dp),
+                            )
+                        },
+                        onClick = { showAttachMenu = false },
+                        modifier = Modifier.handCursor(),
+                    )
+                }
             }
 
             // Text Input Box
@@ -156,24 +213,7 @@ fun ReferenceComposer(
                 )
             }
 
-            // Bubbly Voice Button
-            IconButton(
-                onClick = {},
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .background(Color.White.copy(alpha = 0.05f))
-                    .handCursor(),
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Mic,
-                    contentDescription = "Voice",
-                    tint = RedTextSecondary,
-                    modifier = Modifier.size(19.dp),
-                )
-            }
-
-            // Action Button (Send / Square Cancel Stop)
+            // Action Button (Send / Square Cancel Stop - Soft Square & Matching Color Scheme)
             IconButton(
                 onClick = {
                     if (isLoading) {
@@ -185,12 +225,12 @@ fun ReferenceComposer(
                 enabled = isLoading || text.trim().isNotBlank(),
                 modifier = Modifier
                     .size(38.dp)
-                    .clip(if (isLoading) RoundedCornerShape(10.dp) else CircleShape)
+                    .clip(RoundedCornerShape(10.dp))
                     .background(
-                        when {
-                            isLoading -> Brush.linearGradient(listOf(Color(0xFFEF5350), Color(0xFFC62828)))
-                            text.trim().isNotBlank() -> Brush.linearGradient(listOf(RedAccent, Color(0xFF5E3FCB)))
-                            else -> SolidColor(Color.White.copy(alpha = 0.1f))
+                        if (isLoading || text.trim().isNotBlank()) {
+                            Brush.linearGradient(listOf(RedAccent, Color(0xFF5E3FCB)))
+                        } else {
+                            SolidColor(Color.White.copy(alpha = 0.1f))
                         },
                     )
                     .handCursor(),
