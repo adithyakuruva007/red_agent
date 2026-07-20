@@ -29,12 +29,17 @@ jobs:
       - name: Grant Execute Permission for Gradlew
         run: chmod +x gradlew
 
-      - name: Build FOSS Release APK
-        run: ./gradlew :androidApp:assembleFossRelease --no-daemon
+      - name: Generate Debug Keystore for Signing
+        run: |
+          mkdir -p ~/.android
+          keytool -genkey -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US" || true
+
+      - name: Build FOSS APKs
+        run: ./gradlew :androidApp:assembleFossDebug :androidApp:assembleFossRelease --no-daemon
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: red-agent-release-apk
-          path: androidApp/build/outputs/apk/foss/release/*.apk
+          name: red-agent-apks
+          path: androidApp/build/outputs/apk/**/*.apk
 
