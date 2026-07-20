@@ -18,7 +18,6 @@
     <application
         android:name="com.inspiredandroid.red.RedApplication"
         android:allowBackup="true"
-        android:extractNativeLibs="true"
         android:requestLegacyExternalStorage="true"
         android:fullBackupContent="@xml/backup_rules"
         android:dataExtractionRules="@xml/data_extraction_rules"

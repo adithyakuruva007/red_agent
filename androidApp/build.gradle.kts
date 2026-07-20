@@ -49,7 +49,7 @@ android {
             excludes += "/META-INF/*.RSA"
         }
         jniLibs {
-            useLegacyPackaging = false
+            useLegacyPackaging = true
         }
     }
 
