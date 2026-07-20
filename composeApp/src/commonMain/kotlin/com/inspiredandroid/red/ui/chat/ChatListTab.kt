@@ -22,8 +22,11 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -93,17 +96,17 @@ fun ChatListTab(
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
             )
-            androidx.compose.material3.Button(
+            Button(
                 onClick = { showContextDialog = true },
                 shape = RoundedCornerShape(10.dp),
-                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                colors = ButtonDefaults.buttonColors(
                     containerColor = Color.White.copy(alpha = 0.08f),
                     contentColor = RedTextPrimary,
                 ),
                 modifier = Modifier.handCursor(),
             ) {
                 Icon(
-                    imageVector = androidx.compose.material.icons.filled.Folder,
+                    imageVector = Icons.Default.Folder,
                     contentDescription = "Context",
                     tint = RedAccent,
                     modifier = Modifier.size(18.dp),
@@ -175,6 +178,8 @@ fun ChatListTab(
                 imageVector = Icons.Default.Add,
                 contentDescription = "New chat",
                 tint = Color.White,
+                modifier = Modifier.size(28.dp),
+            )
         }
     }
 
