@@ -257,9 +257,9 @@ class SettingsViewModel(
     private fun buildConfiguredServiceEntries(): List<ConfiguredServiceEntry> = dataRepository.getConfiguredServiceInstances().map { instance ->
         val service = Service.fromId(instance.serviceId)
         val models = dataRepository.getInstanceModels(instance.instanceId, service).value
-        val selectedModelId = dataRepository.getInstanceSelectedModelId(instance.instanceId, service)
+        val selectedModelId = dataRepository.appSettings.getInstanceModelId(instance.instanceId)
         val selectedModel = models.firstOrNull { it.id == selectedModelId || it.isSelected }
-            ?: if (selectedModelId.isNotBlank()) SettingsModel(id = selectedModelId, isSelected = true) else null
+            ?: if (selectedModelId.isNotBlank()) SettingsModel(id = selectedModelId, subtitle = selectedModelId, isSelected = true) else null
         ConfiguredServiceEntry(
             instanceId = instance.instanceId,
             service = service,

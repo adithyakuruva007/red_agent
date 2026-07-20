@@ -77,6 +77,7 @@ internal fun GeneralContent(uiState: SettingsUiState, actions: SettingsActions) 
                             isDynamicUiEnabled = uiState.isDynamicUiEnabled,
                             onToggleDynamicUi = actions.onToggleDynamicUi,
                         )
+                    }
                 }
                 Column(
                     modifier = Modifier.weight(1f),
