@@ -236,11 +236,8 @@ class SettingsViewModel(
     }
 
     fun onScreenVisible() {
-        if (!hasCheckedInitialConnection) {
-            hasCheckedInitialConnection = true
-            checkAllConnections()
-            connectEnabledMcpServers()
-        }
+        checkAllConnections()
+        connectEnabledMcpServers()
         // Re-read notification listener state every time the screen becomes visible:
         // the user may have toggled access in system settings while we were backgrounded.
         if (isNotificationsSupported) {
@@ -334,6 +331,10 @@ class SettingsViewModel(
         _state.update { it.copy(expandedServiceId = instanceId) }
         if (instanceId != null) {
             refreshInstanceModels(instanceId)
+            val entry = _state.value.configuredServices.find { it.instanceId == instanceId }
+            if (entry != null && entry.connectionStatus != ConnectionStatus.Connected && entry.connectionStatus != ConnectionStatus.Checking) {
+                checkConnection(instanceId, entry.service)
+            }
         }
     }
 
@@ -396,6 +397,9 @@ class SettingsViewModel(
         val entry = _state.value.configuredServices.find { it.instanceId == instanceId } ?: return
         dataRepository.updateInstanceSelectedModel(instanceId, entry.service, modelId)
         refreshServiceList()
+        if (entry.connectionStatus != ConnectionStatus.Connected) {
+            checkConnection(instanceId, entry.service)
+        }
     }
 
     private fun onSaveSoul(text: String) {

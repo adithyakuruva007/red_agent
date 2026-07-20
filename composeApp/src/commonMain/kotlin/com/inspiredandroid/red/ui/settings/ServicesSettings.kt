@@ -771,13 +771,13 @@ private fun ConnectionStatusIndicator(status: ConnectionStatus) {
                     imageVector = Icons.Default.CheckCircle,
                     contentDescription = null,
                     modifier = Modifier.size(16.dp),
-                    tint = MaterialTheme.colorScheme.primary,
+                    tint = StatusColorConnected,
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(
                     text = stringResource(Res.string.settings_status_connected),
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.primary,
+                    color = StatusColorConnected,
                 )
             }
         }

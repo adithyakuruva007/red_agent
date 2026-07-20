@@ -1,5 +1,7 @@
 package com.inspiredandroid.red.ui.chat
 
+import androidx.compose.ui.layout.ContentScale
+import coil3.compose.AsyncImage
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -224,12 +226,21 @@ private fun ConversationRow(
                 ),
             contentAlignment = Alignment.Center,
         ) {
-            Text(
-                text = conversation.title.take(2).ifEmpty { "??" },
-                color = RedTextPrimary,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.SemiBold,
-            )
+            if (conversation.avatarPath != null) {
+                AsyncImage(
+                    model = conversation.avatarPath,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            } else {
+                Text(
+                    text = conversation.title.take(2).ifEmpty { "??" },
+                    color = RedTextPrimary,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                )
+            }
         }
 
         Spacer(Modifier.width(12.dp))

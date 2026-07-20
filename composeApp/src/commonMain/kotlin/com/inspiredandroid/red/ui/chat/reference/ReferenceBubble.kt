@@ -89,7 +89,7 @@ fun ReferenceAgentBubble(
     ) {
         Box(
             modifier = Modifier
-                .fillMaxWidth(0.92f)
+                .widthIn(max = 340.dp)
                 .clip(RoundedCornerShape(18.dp, 18.dp, 18.dp, 5.dp))
                 .background(RedBgPanel)
                 .border(1.dp, RedBorderHairline, RoundedCornerShape(18.dp, 18.dp, 18.dp, 5.dp))

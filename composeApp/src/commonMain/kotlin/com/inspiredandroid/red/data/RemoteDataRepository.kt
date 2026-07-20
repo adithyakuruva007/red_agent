@@ -1631,6 +1631,12 @@ class RemoteDataRepository(
         conversationStorage.saveConversation(updated)
     }
 
+    override suspend fun updateConversationAvatar(id: String, avatarPath: String?) {
+        val existing = savedConversations.value.find { it.id == id } ?: return
+        val updated = existing.copy(avatarPath = avatarPath, updatedAt = Clock.System.now().toEpochMilliseconds())
+        conversationStorage.saveConversation(updated)
+    }
+
     override suspend fun toggleStarConversation(id: String) {
         val existing = savedConversations.value.find { it.id == id } ?: return
         val updated = existing.copy(isStarred = !existing.isStarred, updatedAt = Clock.System.now().toEpochMilliseconds())

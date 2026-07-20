@@ -50,15 +50,20 @@ fun ReferenceChatScreen(
         chatState.savedConversations.find { it.id == chatState.currentConversationId }?.title ?: ""
     }
 
+    val persistentAvatar = remember(chatState.currentConversationId, chatState.savedConversations) {
+        chatState.savedConversations.find { it.id == chatState.currentConversationId }?.avatarPath
+    }
+
     var showContextDialog by remember { androidx.compose.runtime.mutableStateOf(false) }
-    var customAvatarLabel by remember(chatState.currentConversationId) { androidx.compose.runtime.mutableStateOf<String?>(null) }
 
     val avatarPickerLauncher = rememberFilePickerLauncher(
         type = FileKitType.Image,
     ) { file ->
         val selectedPath = file?.getPlatformPath() ?: file?.name
         if (selectedPath != null) {
-            customAvatarLabel = selectedPath
+            chatState.currentConversationId?.let { convId ->
+                chatState.actions.updateConversationAvatar(convId, selectedPath)
+            }
         }
     }
 
@@ -70,7 +75,7 @@ fun ReferenceChatScreen(
 
     LaunchedEffect(chatState.history.size, chatState.isLoading) {
         if (chatState.history.isNotEmpty()) {
-            listState.animateScrollToItem(chatState.history.size - 1)
+            listState.scrollToItem(chatState.history.size - 1)
         }
     }
 
@@ -88,8 +93,12 @@ fun ReferenceChatScreen(
                     }
                 },
                 onOpenContext = { showContextDialog = true },
-                customAvatarLabel = customAvatarLabel,
-                onUpdateAvatar = { customAvatarLabel = it },
+                customAvatarLabel = persistentAvatar,
+                onUpdateAvatar = { avatarPath ->
+                    chatState.currentConversationId?.let { convId ->
+                        chatState.actions.updateConversationAvatar(convId, avatarPath)
+                    }
+                },
                 onPickAvatarFile = { avatarPickerLauncher.launch() },
             )
 

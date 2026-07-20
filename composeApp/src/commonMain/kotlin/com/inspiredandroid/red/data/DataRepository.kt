@@ -56,6 +56,7 @@ interface DataRepository {
     fun loadConversation(id: String)
     suspend fun deleteConversation(id: String)
     suspend fun renameConversation(id: String, newTitle: String)
+    suspend fun updateConversationAvatar(id: String, avatarPath: String?)
     suspend fun toggleStarConversation(id: String)
     fun startNewChat()
     fun regenerate()

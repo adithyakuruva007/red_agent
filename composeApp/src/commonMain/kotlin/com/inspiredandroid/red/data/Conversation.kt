@@ -29,6 +29,7 @@ data class Conversation(
     val shellTranscript: List<TerminalLine> = emptyList(),
     val isStarred: Boolean = false,
     val serviceInstanceId: String? = null,
+    val avatarPath: String? = null,
 ) {
     companion object {
         const val TYPE_CHAT = "chat"

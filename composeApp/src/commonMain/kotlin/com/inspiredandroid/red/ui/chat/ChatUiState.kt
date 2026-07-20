@@ -67,6 +67,7 @@ data class ConversationSummary(
     val isHeartbeat: Boolean = false,
     val isInteractive: Boolean = false,
     val isStarred: Boolean = false,
+    val avatarPath: String? = null,
 )
 
 @Immutable

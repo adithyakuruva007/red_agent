@@ -75,6 +75,7 @@ class ChatViewModel(
         loadConversation = ::loadConversation,
         deleteConversation = ::deleteConversation,
         renameConversation = ::renameConversation,
+        updateConversationAvatar = ::updateConversationAvatar,
         toggleStarConversation = ::toggleStarConversation,
         clearUnreadHeartbeat = ::clearUnreadHeartbeat,
         clearSnackbar = ::clearSnackbar,
@@ -171,6 +172,7 @@ class ChatViewModel(
                     isHeartbeat = isHeartbeat,
                     isInteractive = isInteractive,
                     isStarred = it.isStarred,
+                    avatarPath = it.avatarPath,
                 )
             }
         stateVal.copy(
@@ -462,6 +464,12 @@ class ChatViewModel(
     private fun renameConversation(id: String, newTitle: String) {
         viewModelScope.launch(backgroundDispatcher) {
             dataRepository.renameConversation(id, newTitle)
+        }
+    }
+
+    private fun updateConversationAvatar(id: String, avatarPath: String?) {
+        viewModelScope.launch(backgroundDispatcher) {
+            dataRepository.updateConversationAvatar(id, avatarPath)
         }
     }
 
