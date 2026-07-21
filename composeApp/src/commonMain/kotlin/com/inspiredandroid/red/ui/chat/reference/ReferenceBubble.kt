@@ -16,6 +16,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -87,9 +91,9 @@ fun ReferenceAgentBubble(
     onCopy: (() -> Unit)? = null,
 ) {
     val clipboardManager = LocalClipboardManager.current
-    var isThinkingExpanded by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+    var isThinkingExpanded by remember { mutableStateOf(false) }
 
-    val document = androidx.compose.runtime.remember(content) {
+    val document = remember(content) {
         if (content.isNotEmpty()) com.inspiredandroid.red.ui.markdown.parseMarkdown(content) else null
     }
 
