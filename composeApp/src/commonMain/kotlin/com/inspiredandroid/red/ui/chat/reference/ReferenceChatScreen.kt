@@ -139,9 +139,11 @@ fun ReferenceChatScreen(
                             }
 
                             History.Role.ASSISTANT -> {
-                                if (entry.content.isNotEmpty() && !entry.isThinking) {
+                                if (entry.content.isNotEmpty() || entry.reasoningContent?.isNotEmpty() == true) {
                                     ReferenceAgentBubble(
                                         content = entry.content,
+                                        reasoningContent = entry.reasoningContent,
+                                        isThinking = entry.isThinking,
                                         onCopy = onCopyMessage,
                                     )
                                 }
