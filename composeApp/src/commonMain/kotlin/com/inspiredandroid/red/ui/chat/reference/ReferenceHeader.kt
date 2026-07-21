@@ -89,39 +89,6 @@ fun ReferenceHeader(
             )
         }
 
-        val isImagePath = customAvatarLabel?.let { it.contains("/") || it.startsWith("file:") } == true
-        val displayAvatarLabel = (customAvatarLabel?.takeIf { !isImagePath && it.isNotBlank() }
-            ?: title.firstOrNull()?.toString()
-            ?: "R").uppercase()
-
-        Box(
-            modifier = Modifier
-                .size(38.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(
-                    Brush.linearGradient(listOf(Color(0xFF8B6CF2), Color(0xFF5E3FCB))),
-                ),
-            contentAlignment = Alignment.Center,
-        ) {
-            if (isImagePath) {
-                coil3.compose.AsyncImage(
-                    model = customAvatarLabel,
-                    contentDescription = "Avatar Picture",
-                    contentScale = androidx.compose.ui.layout.ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize(),
-                )
-            } else {
-                Text(
-                    text = displayAvatarLabel,
-                    color = Color.White,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                )
-            }
-        }
-
-        Spacer(Modifier.width(10.dp))
-
         Row(
             modifier = Modifier.weight(1f),
             verticalAlignment = Alignment.CenterVertically,
@@ -184,23 +151,6 @@ fun ReferenceHeader(
                         showMenu = false
                         renameText = title
                         showRenameDialog = true
-                    },
-                    modifier = Modifier.handCursor(),
-                )
-                DropdownMenuItem(
-                    text = { Text("Profile Pic / Avatar", color = RedTextPrimary) },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.AccountCircle,
-                            contentDescription = "Profile Pic",
-                            tint = RedTextSecondary,
-                            modifier = Modifier.size(18.dp),
-                        )
-                    },
-                    onClick = {
-                        showMenu = false
-                        avatarText = customAvatarLabel ?: ""
-                        showAvatarDialog = true
                     },
                     modifier = Modifier.handCursor(),
                 )

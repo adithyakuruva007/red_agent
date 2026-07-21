@@ -25,7 +25,7 @@ import com.inspiredandroid.red.ui.foundation.ThinkingDots
 
 @Composable
 fun ReferenceTypingIndicator(
-    avatarLabel: String,
+    avatarLabel: String = "",
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -33,23 +33,6 @@ fun ReferenceTypingIndicator(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(
-            modifier = Modifier
-                .size(26.dp)
-                .clip(RoundedCornerShape(9.dp))
-                .background(
-                    Brush.linearGradient(listOf(Color(0xFF8B6CF2), Color(0xFF5E3FCB))),
-                ),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = avatarLabel.firstOrNull()?.uppercase() ?: "A",
-                color = Color.White,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Bold,
-            )
-        }
-
         Box(
             modifier = Modifier
                 .clip(RoundedCornerShape(18.dp, 18.dp, 18.dp, 5.dp))

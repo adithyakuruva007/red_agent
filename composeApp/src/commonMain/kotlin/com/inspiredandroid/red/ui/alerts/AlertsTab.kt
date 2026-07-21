@@ -22,10 +22,16 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -138,12 +144,17 @@ private fun NotificationRow(
     onDelete: () -> Unit,
     onTap: () -> Unit,
 ) {
+    var isExpanded by remember { mutableStateOf(false) }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
             .background(if (notification.isRead) RedBgPanel else RedBgElevated)
-            .clickable(onClick = onTap)
+            .clickable {
+                isExpanded = !isExpanded
+                onTap()
+            }
             .handCursor()
             .padding(horizontal = 12.dp, vertical = 10.dp),
         verticalAlignment = Alignment.Top,
@@ -171,15 +182,16 @@ private fun NotificationRow(
                 color = RedTextPrimary,
                 fontSize = 14.sp,
                 fontWeight = if (notification.isRead) FontWeight.Normal else FontWeight.SemiBold,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
+                maxLines = if (isExpanded) Int.MAX_VALUE else 1,
+                overflow = if (isExpanded) TextOverflow.Clip else TextOverflow.Ellipsis,
             )
             Text(
                 text = notification.content,
                 color = RedTextSecondary,
                 fontSize = 13.sp,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
+                lineHeight = 18.sp,
+                maxLines = if (isExpanded) Int.MAX_VALUE else 2,
+                overflow = if (isExpanded) TextOverflow.Clip else TextOverflow.Ellipsis,
                 modifier = Modifier.padding(top = 2.dp),
             )
             val dateStr = try {
@@ -195,16 +207,24 @@ private fun NotificationRow(
             )
         }
 
-        IconButton(
-            onClick = onDelete,
-            modifier = Modifier.size(28.dp).handCursor(),
-        ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
-                imageVector = Icons.Default.Delete,
-                contentDescription = "Dismiss",
+                imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                contentDescription = if (isExpanded) "Collapse" else "Expand",
                 tint = RedTextTertiary,
-                modifier = Modifier.size(16.dp),
+                modifier = Modifier.size(20.dp).padding(end = 2.dp),
             )
+            IconButton(
+                onClick = onDelete,
+                modifier = Modifier.size(28.dp).handCursor(),
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Dismiss",
+                    tint = RedTextTertiary,
+                    modifier = Modifier.size(16.dp),
+                )
+            }
         }
     }
 }

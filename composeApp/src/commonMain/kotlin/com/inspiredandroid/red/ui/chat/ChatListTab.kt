@@ -212,39 +212,9 @@ private fun ConversationRow(
             .background(bg)
             .clickable(onClick = onClick)
             .handCursor()
-            .padding(horizontal = 12.dp, vertical = 10.dp),
+            .padding(horizontal = 14.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(
-            modifier = Modifier
-                .size(40.dp)
-                .clip(RoundedCornerShape(10.dp))
-                .background(
-                    Brush.linearGradient(
-                        listOf(RedAccent.copy(alpha = 0.6f), RedBgElevated2),
-                    ),
-                ),
-            contentAlignment = Alignment.Center,
-        ) {
-            if (conversation.avatarPath != null) {
-                AsyncImage(
-                    model = conversation.avatarPath,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize(),
-                )
-            } else {
-                Text(
-                    text = conversation.title.take(2).ifEmpty { "??" },
-                    color = RedTextPrimary,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.SemiBold,
-                )
-            }
-        }
-
-        Spacer(Modifier.width(12.dp))
-
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = conversation.title.ifEmpty { "Untitled" },

@@ -50,22 +50,7 @@ fun ReferenceChatScreen(
         chatState.savedConversations.find { it.id == chatState.currentConversationId }?.title ?: ""
     }
 
-    val persistentAvatar = remember(chatState.currentConversationId, chatState.savedConversations) {
-        chatState.savedConversations.find { it.id == chatState.currentConversationId }?.avatarPath
-    }
-
     var showContextDialog by remember { androidx.compose.runtime.mutableStateOf(false) }
-
-    val avatarPickerLauncher = rememberFilePickerLauncher(
-        type = FileKitType.Image,
-    ) { file ->
-        val selectedPath = file?.getPlatformPath() ?: file?.name
-        if (selectedPath != null) {
-            chatState.currentConversationId?.let { convId ->
-                chatState.actions.updateConversationAvatar(convId, selectedPath)
-            }
-        }
-    }
 
     val onCopyMessage: () -> Unit = {
         scope.launch {
@@ -93,13 +78,6 @@ fun ReferenceChatScreen(
                     }
                 },
                 onOpenContext = { showContextDialog = true },
-                customAvatarLabel = persistentAvatar,
-                onUpdateAvatar = { avatarPath ->
-                    chatState.currentConversationId?.let { convId ->
-                        chatState.actions.updateConversationAvatar(convId, avatarPath)
-                    }
-                },
-                onPickAvatarFile = { avatarPickerLauncher.launch() },
             )
 
             Box(
@@ -170,7 +148,7 @@ fun ReferenceChatScreen(
 
                     if (chatState.isLoading) {
                         item(key = "typing") {
-                            ReferenceTypingIndicator(avatarLabel = conversationTitle)
+                            ReferenceTypingIndicator()
                         }
                     }
                 }
