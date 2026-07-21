@@ -119,6 +119,7 @@ fun ReferenceAgentBubble(
                 )
                 .handCursor()
                 .padding(horizontal = 13.dp, vertical = 10.dp),
+        ) {
             Column {
                 val displayReasoning = reasoningContent.takeIf { !it.isNullOrBlank() } ?: if (isThinking) content else null
 
