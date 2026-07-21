@@ -167,6 +167,10 @@ fun ReferenceChatScreen(
                 onSend = { chatState.actions.ask(chatState.inputText.text) },
                 onCancel = { chatState.actions.cancel() },
                 isLoading = chatState.isLoading,
+                files = chatState.files,
+                addFile = chatState.actions.addFile,
+                removeFile = chatState.actions.removeFile,
+                supportedFileExtensions = chatState.supportedFileExtensions,
             )
         }
 

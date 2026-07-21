@@ -31,7 +31,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import io.github.vinceglb.filekit.dialogs.FileKitType
+import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
@@ -56,6 +60,20 @@ fun ReferenceContextDialog(
     val referencedIds by dataRepository.referencedConversationIds.collectAsState()
     val savedConversations by dataRepository.savedConversations.collectAsState()
     val currentConversationId by dataRepository.currentConversationId.collectAsState()
+
+    val scope = rememberCoroutineScope()
+    val contextFilePicker = rememberFilePickerLauncher(
+        type = FileKitType.File(),
+    ) { file ->
+        if (file != null) {
+            scope.launch {
+                try {
+                    val content = file.readBytes().decodeToString()
+                    dataRepository.addContextFile(file.name, content)
+                } catch (_: Exception) {}
+            }
+        }
+    }
 
     var showAddFileModal by remember { mutableStateOf(false) }
     var fileNameInput by remember { mutableStateOf("") }
@@ -87,16 +105,27 @@ fun ReferenceContextDialog(
                         Text(
                             text = "External Context Files & Info",
                             color = RedTextPrimary,
-                            fontSize = 14.sp,
+                            fontSize = 13.5.sp,
                         )
-                        Button(
-                            shape = RoundedCornerShape(8.dp),
-                            onClick = { showAddFileModal = true },
-                            modifier = Modifier.handCursor(),
-                        ) {
-                            Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
-                            Spacer(Modifier.width(4.dp))
-                            Text("Add File", fontSize = 12.sp)
+                        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Button(
+                                shape = RoundedCornerShape(8.dp),
+                                onClick = { contextFilePicker.launch() },
+                                modifier = Modifier.handCursor(),
+                            ) {
+                                Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(14.dp))
+                                Spacer(Modifier.width(2.dp))
+                                Text("Pick File", fontSize = 11.sp)
+                            }
+                            Button(
+                                shape = RoundedCornerShape(8.dp),
+                                onClick = { showAddFileModal = true },
+                                modifier = Modifier.handCursor(),
+                            ) {
+                                Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(14.dp))
+                                Spacer(Modifier.width(2.dp))
+                                Text("Add Note", fontSize = 11.sp)
+                            }
                         }
                     }
 

@@ -4,12 +4,18 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -17,6 +23,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.InsertDriveFile
 import androidx.compose.material.icons.filled.PhotoCamera
@@ -45,16 +52,24 @@ import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.inspiredandroid.red.rememberPlatformCameraLauncher
 import com.inspiredandroid.red.ui.RedAccent
 import com.inspiredandroid.red.ui.RedBgDeep
+import com.inspiredandroid.red.ui.RedBgElevated
 import com.inspiredandroid.red.ui.RedBgPanel
 import com.inspiredandroid.red.ui.RedBorderHairline
 import com.inspiredandroid.red.ui.RedTextPrimary
 import com.inspiredandroid.red.ui.RedTextSecondary
 import com.inspiredandroid.red.ui.RedTextTertiary
 import com.inspiredandroid.red.ui.handCursor
+import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.dialogs.FileKitType
+import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun ReferenceComposer(
@@ -63,17 +78,38 @@ fun ReferenceComposer(
     onSend: () -> Unit,
     onCancel: () -> Unit = {},
     isLoading: Boolean,
+    files: ImmutableList<PlatformFile> = persistentListOf(),
+    addFile: (PlatformFile) -> Unit = {},
+    removeFile: (PlatformFile) -> Unit = {},
+    supportedFileExtensions: ImmutableList<String> = persistentListOf(),
     modifier: Modifier = Modifier,
 ) {
     var showAttachMenu by remember { mutableStateOf(false) }
 
     val handleSend = {
-        if (text.trim().isNotBlank() && !isLoading) {
+        if ((text.trim().isNotBlank() || files.isNotEmpty()) && !isLoading) {
             onSend()
         }
     }
 
-    Box(
+    val allowFileAttachment = supportedFileExtensions.isNotEmpty()
+    val filePickerLauncher = rememberFilePickerLauncher(
+        type = if (allowFileAttachment) FileKitType.File(extensions = supportedFileExtensions.toList()) else FileKitType.File(),
+    ) { file ->
+        if (file != null) addFile(file)
+    }
+
+    val photoPickerLauncher = rememberFilePickerLauncher(
+        type = FileKitType.Image,
+    ) { file ->
+        if (file != null) addFile(file)
+    }
+
+    val cameraPickerLauncher = rememberPlatformCameraLauncher { file ->
+        if (file != null) addFile(file)
+    }
+
+    Column(
         modifier = modifier
             .fillMaxWidth()
             .background(RedBgDeep)
@@ -81,6 +117,23 @@ fun ReferenceComposer(
             .imePadding()
             .padding(horizontal = 14.dp, vertical = 8.dp),
     ) {
+        // Render Attached File Chips if files present
+        if (files.isNotEmpty()) {
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 6.dp),
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+                items(files) { file ->
+                    AttachedFileChip(
+                        file = file,
+                        onRemove = { removeFile(file) },
+                    )
+                }
+            }
+        }
+
         // Soft Rectangular Container
         Row(
             modifier = Modifier
@@ -134,7 +187,10 @@ fun ReferenceComposer(
                                 modifier = Modifier.size(18.dp),
                             )
                         },
-                        onClick = { showAttachMenu = false },
+                        onClick = {
+                            showAttachMenu = false
+                            filePickerLauncher.launch()
+                        },
                         modifier = Modifier.handCursor(),
                     )
                     DropdownMenuItem(
@@ -147,7 +203,10 @@ fun ReferenceComposer(
                                 modifier = Modifier.size(18.dp),
                             )
                         },
-                        onClick = { showAttachMenu = false },
+                        onClick = {
+                            showAttachMenu = false
+                            cameraPickerLauncher.launch()
+                        },
                         modifier = Modifier.handCursor(),
                     )
                     DropdownMenuItem(
@@ -160,7 +219,10 @@ fun ReferenceComposer(
                                 modifier = Modifier.size(18.dp),
                             )
                         },
-                        onClick = { showAttachMenu = false },
+                        onClick = {
+                            showAttachMenu = false
+                            photoPickerLauncher.launch()
+                        },
                         modifier = Modifier.handCursor(),
                     )
                 }
@@ -212,7 +274,8 @@ fun ReferenceComposer(
                 )
             }
 
-            // Action Button (Send / Square Cancel Stop - Soft Square & Signature Blue Color Scheme)
+            // Action Button (Send / Square Cancel Stop)
+            val canSend = isLoading || text.trim().isNotBlank() || files.isNotEmpty()
             IconButton(
                 onClick = {
                     if (isLoading) {
@@ -221,12 +284,12 @@ fun ReferenceComposer(
                         handleSend()
                     }
                 },
-                enabled = isLoading || text.trim().isNotBlank(),
+                enabled = canSend,
                 modifier = Modifier
                     .size(32.dp)
                     .clip(RoundedCornerShape(8.dp))
                     .background(
-                        if (isLoading || text.trim().isNotBlank()) {
+                        if (canSend) {
                             Brush.linearGradient(listOf(RedAccent, Color(0xFF3E5FCB)))
                         } else {
                             SolidColor(Color.White.copy(alpha = 0.08f))
@@ -237,10 +300,53 @@ fun ReferenceComposer(
                 Icon(
                     imageVector = if (isLoading) Icons.Default.Stop else Icons.AutoMirrored.Filled.Send,
                     contentDescription = if (isLoading) "Cancel" else "Send",
-                    tint = if (isLoading || text.trim().isNotBlank()) Color.White else RedTextTertiary,
+                    tint = if (canSend) Color.White else RedTextTertiary,
                     modifier = Modifier.size(16.dp),
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun AttachedFileChip(
+    file: PlatformFile,
+    onRemove: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .clip(RoundedCornerShape(8.dp))
+            .background(RedBgElevated)
+            .border(1.dp, RedBorderHairline, RoundedCornerShape(8.dp))
+            .padding(horizontal = 8.dp, vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            imageVector = Icons.Default.InsertDriveFile,
+            contentDescription = null,
+            tint = RedAccent,
+            modifier = Modifier.size(14.dp),
+        )
+        Spacer(Modifier.width(4.dp))
+        Text(
+            text = file.name,
+            color = RedTextPrimary,
+            fontSize = 12.sp,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.widthIn(max = 120.dp),
+        )
+        Spacer(Modifier.width(4.dp))
+        IconButton(
+            onClick = onRemove,
+            modifier = Modifier.size(18.dp).handCursor(),
+        ) {
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = "Remove",
+                tint = RedTextTertiary,
+                modifier = Modifier.size(12.dp),
+            )
         }
     }
 }
