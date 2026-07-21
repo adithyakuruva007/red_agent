@@ -172,6 +172,8 @@ fun ReferenceChatScreen(
                 removeFile = chatState.actions.removeFile,
                 supportedFileExtensions = chatState.supportedFileExtensions,
                 installedSkills = chatState.installedSkills,
+                availableServices = chatState.availableServices,
+                onSelectService = chatState.actions.selectService,
             )
         }
 

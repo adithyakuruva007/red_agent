@@ -1,7 +1,9 @@
 package com.inspiredandroid.red.ui.chat.composables
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -13,11 +15,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,44 +32,69 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
 import com.inspiredandroid.red.data.ServiceEntry
+import com.inspiredandroid.red.ui.RedAccent
+import com.inspiredandroid.red.ui.RedBgPanel
+import com.inspiredandroid.red.ui.RedBorderHairline
+import com.inspiredandroid.red.ui.RedTextPrimary
+import com.inspiredandroid.red.ui.RedTextSecondary
 import com.inspiredandroid.red.ui.handCursor
-import com.inspiredandroid.red.ui.redIconButtonSurface
 import kotlinx.collections.immutable.ImmutableList
-import org.jetbrains.compose.resources.vectorResource
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
-internal fun ServiceSelector(
+fun ServiceSelector(
     services: ImmutableList<ServiceEntry>,
     onSelectService: (String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     if (services.isEmpty()) return
 
     val current = services.first()
     var expanded by remember { mutableStateOf(false) }
 
-    Box {
-        Box(
+    Box(modifier = modifier) {
+        Row(
             modifier = Modifier
-                .size(28.dp)
-                .redIconButtonSurface(shape = RoundedCornerShape(6.dp))
+                .clip(RoundedCornerShape(8.dp))
+                .background(Color.White.copy(alpha = 0.06f))
                 .clickable { expanded = true }
-                .handCursor(),
-            contentAlignment = Alignment.Center,
+                .handCursor()
+                .padding(horizontal = 8.dp, vertical = 5.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             Icon(
-                imageVector = vectorResource(current.icon),
+                painter = painterResource(current.icon),
                 contentDescription = current.serviceName,
+                tint = RedAccent,
                 modifier = Modifier.size(15.dp),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Text(
+                text = current.modelId.ifEmpty { current.serviceName },
+                color = RedTextPrimary,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Medium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.widthIn(max = 110.dp),
+            )
+            Icon(
+                imageVector = Icons.Default.KeyboardArrowDown,
+                contentDescription = "Select Model",
+                tint = RedTextSecondary,
+                modifier = Modifier.size(14.dp),
             )
         }
 
@@ -75,22 +102,22 @@ internal fun ServiceSelector(
             val spacingPx = with(LocalDensity.current) { 8.dp.roundToPx() }
             Popup(
                 onDismissRequest = { expanded = false },
-                properties = PopupProperties(focusable = false),
+                properties = PopupProperties(focusable = true),
                 popupPositionProvider = remember(spacingPx) { AnchorAbovePositionProvider(spacingPx) },
             ) {
                 BoxWithConstraints {
-                    val maxMenuHeight = maxHeight - 24.dp // keep a margin from screen edges
+                    val maxMenuHeight = maxHeight - 32.dp
                     Surface(
                         shape = RoundedCornerShape(16.dp),
-                        color = MaterialTheme.colorScheme.surface,
-                        tonalElevation = 3.dp,
+                        color = RedBgPanel,
+                        border = BorderStroke(1.dp, RedBorderHairline),
                         shadowElevation = 8.dp,
                     ) {
                         Column(
                             modifier = Modifier
                                 .heightIn(max = maxMenuHeight)
                                 .verticalScroll(rememberScrollState())
-                                .padding(vertical = 4.dp),
+                                .padding(vertical = 6.dp),
                         ) {
                             services.forEach { entry ->
                                 val isCurrent = entry.instanceId == current.instanceId
@@ -119,49 +146,39 @@ private fun ServiceMenuItem(
     isCurrent: Boolean,
     onClick: () -> Unit,
 ) {
-    val rowBackground = if (isCurrent) {
-        MaterialTheme.colorScheme.primaryContainer
-    } else {
-        Color.Transparent
-    }
-    val textColor = if (isCurrent) {
-        MaterialTheme.colorScheme.onPrimaryContainer
-    } else {
-        MaterialTheme.colorScheme.onSurface
-    }
-    val subTextColor = if (isCurrent) {
-        MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
-    } else {
-        MaterialTheme.colorScheme.onSurfaceVariant
-    }
+    val rowBackground = if (isCurrent) RedAccent.copy(alpha = 0.15f) else Color.Transparent
+    val textColor = if (isCurrent) RedAccent else RedTextPrimary
+    val subTextColor = if (isCurrent) RedAccent.copy(alpha = 0.8f) else RedTextSecondary
+
     Row(
         modifier = Modifier
-            .padding(horizontal = 4.dp)
-            .clip(RoundedCornerShape(12.dp))
+            .padding(horizontal = 6.dp, vertical = 2.dp)
+            .clip(RoundedCornerShape(10.dp))
             .background(rowBackground)
             .clickable(onClick = onClick)
             .handCursor()
-            .padding(horizontal = 12.dp, vertical = 10.dp)
-            .widthIn(min = 200.dp),
+            .padding(horizontal = 12.dp, vertical = 8.dp)
+            .widthIn(min = 210.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
-            imageVector = vectorResource(entry.icon),
+            painter = painterResource(entry.icon),
             contentDescription = null,
             modifier = Modifier.size(18.dp),
             tint = textColor,
         )
-        Spacer(Modifier.width(12.dp))
+        Spacer(Modifier.width(10.dp))
         Column {
             Text(
                 text = entry.serviceName,
-                style = MaterialTheme.typography.bodyMedium,
+                fontSize = 13.5.sp,
+                fontWeight = FontWeight.SemiBold,
                 color = textColor,
             )
             if (entry.modelId.isNotEmpty()) {
                 Text(
                     text = entry.modelId,
-                    style = MaterialTheme.typography.bodySmall,
+                    fontSize = 11.5.sp,
                     color = subTextColor,
                 )
             }

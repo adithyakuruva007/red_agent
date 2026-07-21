@@ -55,6 +55,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.inspiredandroid.red.data.ServiceEntry
 import com.inspiredandroid.red.rememberPlatformCameraLauncher
 import com.inspiredandroid.red.skills.SkillManifest
 import com.inspiredandroid.red.ui.RedAccent
@@ -65,6 +66,7 @@ import com.inspiredandroid.red.ui.RedBorderHairline
 import com.inspiredandroid.red.ui.RedTextPrimary
 import com.inspiredandroid.red.ui.RedTextSecondary
 import com.inspiredandroid.red.ui.RedTextTertiary
+import com.inspiredandroid.red.ui.chat.composables.ServiceSelector
 import com.inspiredandroid.red.ui.chat.composables.SkillAutocomplete
 import com.inspiredandroid.red.ui.chat.composables.detectSlashQuery
 import com.inspiredandroid.red.ui.handCursor
@@ -98,6 +100,8 @@ fun ReferenceComposer(
     removeFile: (PlatformFile) -> Unit = {},
     supportedFileExtensions: ImmutableList<String> = persistentListOf(),
     installedSkills: ImmutableList<SkillManifest> = persistentListOf(),
+    availableServices: ImmutableList<ServiceEntry> = persistentListOf(),
+    onSelectService: (String) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     var showAttachMenu by remember { mutableStateOf(false) }
@@ -267,6 +271,14 @@ fun ReferenceComposer(
                         modifier = Modifier.handCursor(),
                     )
                 }
+            }
+
+            // Model / Service Selector Dropdown
+            if (availableServices.isNotEmpty()) {
+                ServiceSelector(
+                    services = availableServices,
+                    onSelectService = onSelectService,
+                )
             }
 
             // Text Input Box
