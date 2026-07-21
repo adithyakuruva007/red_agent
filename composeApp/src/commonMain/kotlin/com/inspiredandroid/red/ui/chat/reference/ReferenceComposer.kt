@@ -56,6 +56,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.inspiredandroid.red.rememberPlatformCameraLauncher
+import com.inspiredandroid.red.skills.SkillManifest
 import com.inspiredandroid.red.ui.RedAccent
 import com.inspiredandroid.red.ui.RedBgDeep
 import com.inspiredandroid.red.ui.RedBgElevated
@@ -64,12 +65,26 @@ import com.inspiredandroid.red.ui.RedBorderHairline
 import com.inspiredandroid.red.ui.RedTextPrimary
 import com.inspiredandroid.red.ui.RedTextSecondary
 import com.inspiredandroid.red.ui.RedTextTertiary
+import com.inspiredandroid.red.ui.chat.composables.SkillAutocomplete
+import com.inspiredandroid.red.ui.chat.composables.detectSlashQuery
 import com.inspiredandroid.red.ui.handCursor
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.dialogs.FileKitType
 import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
+
+private fun getDefaultSkillsList(): List<SkillManifest> = listOf(
+    SkillManifest(id = "help", displayName = "Help", description = "Get help & list available skills and tools", body = ""),
+    SkillManifest(id = "summarize", displayName = "Summarize", description = "Summarize text, links, or documents", body = ""),
+    SkillManifest(id = "code", displayName = "Code Assistant", description = "Write, refactor, or debug code", body = ""),
+    SkillManifest(id = "search", displayName = "Web Search", description = "Search the web for real-time information", body = ""),
+    SkillManifest(id = "image", displayName = "Image Generation", description = "Generate or analyze images", body = ""),
+    SkillManifest(id = "clear", displayName = "Clear Chat", description = "Clear current conversation history", body = ""),
+    SkillManifest(id = "web", displayName = "Web Fetch", description = "Fetch and extract text from web URLs", body = ""),
+    SkillManifest(id = "context", displayName = "Context Manager", description = "View or add context files", body = ""),
+)
 
 @Composable
 fun ReferenceComposer(
@@ -82,6 +97,7 @@ fun ReferenceComposer(
     addFile: (PlatformFile) -> Unit = {},
     removeFile: (PlatformFile) -> Unit = {},
     supportedFileExtensions: ImmutableList<String> = persistentListOf(),
+    installedSkills: ImmutableList<SkillManifest> = persistentListOf(),
     modifier: Modifier = Modifier,
 ) {
     var showAttachMenu by remember { mutableStateOf(false) }
@@ -109,6 +125,16 @@ fun ReferenceComposer(
         if (file != null) addFile(file)
     }
 
+    val slashQuery = remember(text) {
+        detectSlashQuery(text, text.length)
+    }
+
+    val allSkills = remember(installedSkills) {
+        val defaults = getDefaultSkillsList()
+        val merged = (installedSkills + defaults).distinctBy { it.id }
+        merged.toImmutableList()
+    }
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -117,6 +143,21 @@ fun ReferenceComposer(
             .imePadding()
             .padding(horizontal = 14.dp, vertical = 8.dp),
     ) {
+        // Slash Autocomplete Menu for Tools and Skills
+        if (slashQuery != null) {
+            SkillAutocomplete(
+                skills = allSkills,
+                query = slashQuery,
+                onSelect = { skill ->
+                    val firstSpace = text.indexOfFirst { it.isWhitespace() }
+                    val rest = if (firstSpace < 0) "" else text.substring(firstSpace)
+                    val newText = "/${skill.id} $rest"
+                    onTextChange(newText)
+                },
+                modifier = Modifier.padding(bottom = 6.dp),
+            )
+        }
+
         // Render Attached File Chips if files present
         if (files.isNotEmpty()) {
             LazyRow(

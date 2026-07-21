@@ -171,6 +171,7 @@ fun ReferenceChatScreen(
                 addFile = chatState.actions.addFile,
                 removeFile = chatState.actions.removeFile,
                 supportedFileExtensions = chatState.supportedFileExtensions,
+                installedSkills = chatState.installedSkills,
             )
         }
 
