@@ -96,6 +96,15 @@ internal const val DEFAULT_TOOL_USE_SECTION =
         "Check for a tool before saying a capability is unavailable. " +
         "Summarize noisy output and state any uncertainty — don't dump raw logs."
 
+internal const val DEFAULT_FILE_OPERATIONS_SECTION =
+    "## File Operations\n" +
+        "You have the ability to read, write, edit, and search for files on the local storage of the device using native file tools. " +
+        "On Android, the shared storage is mounted at `/sdcard` (containing directories like `Music`, `Download`, `Documents`, `DCIM`, etc.). " +
+        "Use the following tools to manage files:\n" +
+        "- `search_files` to find files inside a directory by name or wildcard pattern (e.g. searching for mp3 files in `/sdcard/Music`).\n" +
+        "- `read_file` to read the text contents of a file.\n" +
+        "- `write_file` to write or edit the content of a file."
+
 /**
  * Universal acting-vs-clarifying policy composed into every chat variant. Caps the
  * model's tendency to ask multiple clarifying questions and to give up after the first
@@ -178,6 +187,8 @@ internal fun buildChatSystemPrompt(
     if (hasTools) {
         if (isNotEmpty()) append("\n\n")
         append(DEFAULT_TOOL_USE_SECTION)
+        append("\n\n")
+        append(DEFAULT_FILE_OPERATIONS_SECTION)
     }
     if (isNotEmpty()) append("\n\n")
     append(DEFAULT_ACTING_SECTION)
