@@ -20,7 +20,7 @@ import com.inspiredandroid.red.data.ServiceInstance
 import com.inspiredandroid.red.data.SmsDraft
 import com.inspiredandroid.red.data.SmsSyncState
 import com.inspiredandroid.red.data.SystemPromptVariant
-import com.inspiredandroid.red.data.ThemeMode
+
 import com.inspiredandroid.red.data.currentConversationIdOrNull
 import com.inspiredandroid.red.inference.DownloadError
 import com.inspiredandroid.red.inference.DownloadedModel
@@ -387,13 +387,7 @@ class FakeDataRepository : DataRepository {
         dynamicUiEnabled = enabled
     }
 
-    private var themeMode: ThemeMode = ThemeMode.System
 
-    override fun getThemeMode(): ThemeMode = themeMode
-
-    override fun setThemeMode(mode: ThemeMode) {
-        themeMode = mode
-    }
 
 
 

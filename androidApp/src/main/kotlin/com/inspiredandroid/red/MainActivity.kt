@@ -23,7 +23,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import com.inspiredandroid.red.data.AppSettings
 import com.inspiredandroid.red.data.DataRepository
-import com.inspiredandroid.red.data.ThemeMode
+
 import com.inspiredandroid.red.ui.LightAdwaitaColorScheme
 import com.inspiredandroid.red.ui.DarkAdwaitaBlackColorScheme
 import io.github.vinceglb.filekit.FileKit
@@ -43,13 +43,7 @@ class MainActivity : ComponentActivity() {
         val dynamicColor = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
         val appSettings: AppSettings = get()
         setContent {
-            val themeMode by appSettings.themeModeFlow.collectAsStateWithLifecycle()
-            val systemInDark = isSystemInDarkTheme()
-            val isDarkTheme = when (themeMode) {
-                ThemeMode.System -> systemInDark
-                ThemeMode.Light -> false
-                ThemeMode.Dark, ThemeMode.OledBlack -> true
-            }
+            val isDarkTheme = true
             LaunchedEffect(isDarkTheme) {
                 enableEdgeToEdge(
                     statusBarStyle = if (isDarkTheme) {
