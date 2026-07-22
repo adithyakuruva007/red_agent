@@ -118,7 +118,6 @@ private fun AppContent(
     }
 
     val uiScale by appSettings.uiScaleFlow.collectAsStateWithLifecycle()
-    val themeMode by appSettings.themeModeFlow.collectAsStateWithLifecycle()
     val defaultDensity = LocalDensity.current
     val scaledDensity = remember(defaultDensity, uiScale) {
         Density(defaultDensity.density * uiScale, defaultDensity.fontScale)
@@ -131,7 +130,7 @@ private fun AppContent(
         LocalDensity provides scaledDensity,
         LocalUriHandler provides sandboxAwareUriHandler,
     ) {
-        Theme(themeMode = themeMode) {
+        Theme {
             com.inspiredandroid.red.ui.components.FullScreenImageHost {
                 AppShell(
                     textToSpeech = textToSpeech,

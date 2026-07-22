@@ -9,7 +9,7 @@ import com.inspiredandroid.red.data.DataRepository
 import com.inspiredandroid.red.data.ImportSection
 import com.inspiredandroid.red.data.Service
 import com.inspiredandroid.red.data.TaskScheduler
-import com.inspiredandroid.red.data.ThemeMode
+
 import com.inspiredandroid.red.data.supportsAgenticFlows
 import com.inspiredandroid.red.getBackgroundDispatcher
 import com.inspiredandroid.red.httpClient
@@ -71,7 +71,6 @@ class SettingsViewModel(
         tools = dataRepository.getToolDefinitions().toImmutableList(),
         soulText = dataRepository.getSoulText(),
         isDynamicUiEnabled = dataRepository.isDynamicUiEnabled(),
-        themeMode = dataRepository.getThemeMode(),
         isMemoryEnabled = dataRepository.isMemoryEnabled(),
         memories = dataRepository.getMemories().toImmutableList(),
         isSchedulingEnabled = dataRepository.isSchedulingEnabled(),
@@ -147,7 +146,6 @@ class SettingsViewModel(
         onToggleTool = ::onToggleTool,
         onSaveSoul = ::onSaveSoul,
         onToggleDynamicUi = ::onToggleDynamicUi,
-        onChangeThemeMode = ::onChangeThemeMode,
         onToggleMemory = ::onToggleMemory,
         onDeleteMemory = ::onDeleteMemory,
         onUpdateMemory = ::onUpdateMemory,
@@ -426,10 +424,7 @@ class SettingsViewModel(
         _state.update { it.copy(isDynamicUiEnabled = enabled) }
     }
 
-    private fun onChangeThemeMode(mode: ThemeMode) {
-        dataRepository.setThemeMode(mode)
-        _state.update { it.copy(themeMode = mode) }
-    }
+
 
     private fun onToggleMemory(enabled: Boolean) {
         dataRepository.setMemoryEnabled(enabled)

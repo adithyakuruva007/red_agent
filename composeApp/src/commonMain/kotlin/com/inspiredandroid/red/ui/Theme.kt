@@ -16,13 +16,11 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
@@ -38,75 +36,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.inspiredandroid.red.data.ThemeMode
 
-data class RedColors(
-    val bgDeep: Color,
-    val bgPanel: Color,
-    val bgElevated: Color,
-    val bgElevated2: Color,
-    val borderHairline: Color,
-    val accent: Color,
-    val accentSoft: Color,
-    val agentViolet: Color,
-    val agentVioletSoft: Color,
-    val textPrimary: Color,
-    val textSecondary: Color,
-    val textTertiary: Color,
-    val online: Color,
-    val danger: Color,
-)
-
-val DarkRedColors = RedColors(
-    bgDeep = Color(0xFF0E1420),
-    bgPanel = Color(0xFF151C29),
-    bgElevated = Color(0xFF1D2635),
-    bgElevated2 = Color(0xFF242F41),
-    borderHairline = Color(0x80263144),
-    accent = Color(0xFF5B8DEF),
-    accentSoft = Color(0x265B8DEF),
-    agentViolet = Color(0xFF8B6CF2),
-    agentVioletSoft = Color(0x248B6CF2),
-    textPrimary = Color(0xFFEAEFF5),
-    textSecondary = Color(0xFF98A4B8),
-    textTertiary = Color(0xFF5E6B80),
-    online = Color(0xFF3ED598),
-    danger = Color(0xFFF26D6D)
-)
-
-val LightRedColors = RedColors(
-    bgDeep = Color(0xFFF4F6FB),
-    bgPanel = Color(0xFFFFFFFF),
-    bgElevated = Color(0xFFEBF0F7),
-    bgElevated2 = Color(0xFFDFE6F0),
-    borderHairline = Color(0x1F1A2435),
-    accent = Color(0xFF2A6AE3),
-    accentSoft = Color(0x122A6AE3),
-    agentViolet = Color(0xFF7551EC),
-    agentVioletSoft = Color(0x107551EC),
-    textPrimary = Color(0xFF1E293B),
-    textSecondary = Color(0xFF64748B),
-    textTertiary = Color(0xFF94A3B8),
-    online = Color(0xFF1FA876),
-    danger = Color(0xFFD32F2F)
-)
-
-val LocalRedColors = staticCompositionLocalOf { DarkRedColors }
-
-val RedBgDeep: Color @Composable get() = LocalRedColors.current.bgDeep
-val RedBgPanel: Color @Composable get() = LocalRedColors.current.bgPanel
-val RedBgElevated: Color @Composable get() = LocalRedColors.current.bgElevated
-val RedBgElevated2: Color @Composable get() = LocalRedColors.current.bgElevated2
-val RedBorderHairline: Color @Composable get() = LocalRedColors.current.borderHairline
-val RedAccent: Color @Composable get() = LocalRedColors.current.accent
-val RedAccentSoft: Color @Composable get() = LocalRedColors.current.accentSoft
-val RedAgentViolet: Color @Composable get() = LocalRedColors.current.agentViolet
-val RedAgentVioletSoft: Color @Composable get() = LocalRedColors.current.agentVioletSoft
-val RedTextPrimary: Color @Composable get() = LocalRedColors.current.textPrimary
-val RedTextSecondary: Color @Composable get() = LocalRedColors.current.textSecondary
-val RedTextTertiary: Color @Composable get() = LocalRedColors.current.textTertiary
-val RedOnline: Color @Composable get() = LocalRedColors.current.online
-val RedDanger: Color @Composable get() = LocalRedColors.current.danger
+val RedBgDeep = Color(0xFF0E1420)
+val RedBgPanel = Color(0xFF151C29)
+val RedBgElevated = Color(0xFF1D2635)
+val RedBgElevated2 = Color(0xFF242F41)
+val RedBorderHairline = Color(0x80263144)
+val RedAccent = Color(0xFF5B8DEF)
+val RedAccentSoft = Color(0x265B8DEF)
+val RedAgentViolet = Color(0xFF8B6CF2)
+val RedAgentVioletSoft = Color(0x248B6CF2)
+val RedTextPrimary = Color(0xFFEAEFF5)
+val RedTextSecondary = Color(0xFF98A4B8)
+val RedTextTertiary = Color(0xFF5E6B80)
+val RedOnline = Color(0xFF3ED598)
+val RedDanger = Color(0xFFF26D6D)
 
 val RedGrad1Start = Color(0xFF5B8DEF)
 val RedGrad1End = Color(0xFF3E5FCB)
@@ -144,59 +88,28 @@ val RedTypography = Typography(
     labelSmall = TextStyle(fontFamily = BodyFont, fontWeight = FontWeight.Medium, fontSize = 10.sp),
 )
 
-fun getRedColorScheme(colors: RedColors, isDark: Boolean): ColorScheme {
-    return if (isDark) {
-        darkColorScheme(
-            primary = colors.accent,
-            onPrimary = Color.White,
-            primaryContainer = colors.accentSoft,
-            onPrimaryContainer = colors.accent,
-            secondary = colors.agentViolet,
-            onSecondary = Color.White,
-            secondaryContainer = colors.agentVioletSoft,
-            onSecondaryContainer = colors.agentViolet,
-            surface = colors.bgPanel,
-            onSurface = colors.textPrimary,
-            surfaceVariant = colors.bgElevated,
-            onSurfaceVariant = colors.textSecondary,
-            background = colors.bgDeep,
-            onBackground = colors.textPrimary,
-            outline = colors.borderHairline,
-            outlineVariant = colors.borderHairline,
-            tertiary = colors.online,
-            onTertiary = Color.White,
-            error = colors.danger,
-            onError = Color.White,
-        )
-    } else {
-        lightColorScheme(
-            primary = colors.accent,
-            onPrimary = Color.White,
-            primaryContainer = colors.accentSoft,
-            onPrimaryContainer = colors.accent,
-            secondary = colors.agentViolet,
-            onSecondary = Color.White,
-            secondaryContainer = colors.agentVioletSoft,
-            onSecondaryContainer = colors.agentViolet,
-            surface = colors.bgPanel,
-            onSurface = colors.textPrimary,
-            surfaceVariant = colors.bgElevated,
-            onSurfaceVariant = colors.textSecondary,
-            background = colors.bgDeep,
-            onBackground = colors.textPrimary,
-            outline = colors.borderHairline,
-            outlineVariant = colors.borderHairline,
-            tertiary = colors.online,
-            onTertiary = Color.White,
-            error = colors.danger,
-            onError = Color.White,
-        )
-    }
-}
-
-val RedColorScheme: ColorScheme @Composable get() = getRedColorScheme(LocalRedColors.current, LocalRedColors.current != LightRedColors)
-
-val ColorScheme.isLightFlavor: Boolean @Composable get() = LocalRedColors.current == LightRedColors
+val RedColorScheme = darkColorScheme(
+    primary = RedAccent,
+    onPrimary = Color.White,
+    primaryContainer = RedAccentSoft,
+    onPrimaryContainer = RedAccent,
+    secondary = RedAgentViolet,
+    onSecondary = Color.White,
+    secondaryContainer = RedAgentVioletSoft,
+    onSecondaryContainer = RedAgentViolet,
+    surface = RedBgPanel,
+    onSurface = RedTextPrimary,
+    surfaceVariant = RedBgElevated,
+    onSurfaceVariant = RedTextSecondary,
+    background = RedBgDeep,
+    onBackground = RedTextPrimary,
+    outline = RedBorderHairline,
+    outlineVariant = RedBorderHairline,
+    tertiary = RedOnline,
+    onTertiary = Color.White,
+    error = RedDanger,
+    onError = Color.White,
+)
 
 @Composable
 fun Modifier.handCursor() = pointerHoverIcon(PointerIcon.Hand, overrideDescendants = true)
@@ -341,41 +254,19 @@ fun redSwitchColors() = androidx.compose.material3.SwitchDefaults.colors(
 
 @Composable
 fun Theme(
-    themeMode: ThemeMode = ThemeMode.System,
+    colorScheme: ColorScheme = RedColorScheme,
     content: @Composable () -> Unit,
 ) {
-    val isDark = when (themeMode) {
-        ThemeMode.Light -> false
-        ThemeMode.Dark -> true
-        ThemeMode.OledBlack -> true
-        ThemeMode.System -> androidx.compose.foundation.isSystemInDarkTheme()
-    }
-    
-    val colors = if (isDark) {
-        if (themeMode == ThemeMode.OledBlack) {
-            DarkRedColors.copy(bgDeep = Color.Black, bgPanel = Color.Black)
-        } else {
-            DarkRedColors
-        }
-    } else {
-        LightRedColors
-    }
-    
-    val colorScheme = getRedColorScheme(colors, isDark)
-
-    androidx.compose.runtime.CompositionLocalProvider(
-        LocalRedColors provides colors
+    MaterialTheme(
+        colorScheme = colorScheme,
+        typography = RedTypography,
     ) {
-        MaterialTheme(
-            colorScheme = colorScheme,
-            typography = RedTypography,
-        ) {
-            content()
-        }
+        content()
     }
 }
 
-val DarkAdwaitaBlackColorScheme: ColorScheme @Composable get() = RedColorScheme
-val DarkAdwaitaBlackLightBlueColorScheme: ColorScheme @Composable get() = RedColorScheme
-val LightAdwaitaColorScheme: ColorScheme @Composable get() = RedColorScheme
-val DarkClaymorphismColorScheme: ColorScheme @Composable get() = RedColorScheme
+// Backward-compat aliases for App.kt
+val DarkAdwaitaBlackColorScheme: ColorScheme get() = RedColorScheme
+val DarkAdwaitaBlackLightBlueColorScheme: ColorScheme get() = RedColorScheme
+val LightAdwaitaColorScheme: ColorScheme get() = RedColorScheme
+val DarkClaymorphismColorScheme: ColorScheme get() = RedColorScheme

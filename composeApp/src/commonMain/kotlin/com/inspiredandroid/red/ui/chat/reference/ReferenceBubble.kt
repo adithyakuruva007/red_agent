@@ -157,12 +157,12 @@ fun ReferenceAgentBubble(
                             modifier = Modifier.padding(start = 4.dp, bottom = 4.dp),
                         )
                     }
-                    if (content.isNotEmpty() && !isThinking) {
+                    if (content.isNotEmpty()) {
                         Spacer(Modifier.height(8.dp))
                     }
                 }
 
-                if (document != null && !isThinking) {
+                if (document != null) {
                     SelectionContainer {
                         com.inspiredandroid.red.ui.markdown.MarkdownContent(document = document)
                     }

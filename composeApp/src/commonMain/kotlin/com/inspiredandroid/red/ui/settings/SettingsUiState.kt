@@ -9,7 +9,7 @@ import com.inspiredandroid.red.data.ScheduledTask
 import com.inspiredandroid.red.data.Service
 import com.inspiredandroid.red.data.ServiceEntry
 import com.inspiredandroid.red.data.SmsSyncState
-import com.inspiredandroid.red.data.ThemeMode
+
 import com.inspiredandroid.red.inference.DownloadError
 import com.inspiredandroid.red.inference.LocalModel
 import com.inspiredandroid.red.network.tools.ToolInfo
@@ -63,7 +63,6 @@ data class SettingsUiState(
     val tools: ImmutableList<ToolInfo> = persistentListOf(),
     val soulText: String = "",
     val isDynamicUiEnabled: Boolean = true,
-    val themeMode: ThemeMode = ThemeMode.System,
     val isMemoryEnabled: Boolean = true,
     val memories: ImmutableList<MemoryEntry> = persistentListOf(),
     val isSchedulingEnabled: Boolean = true,

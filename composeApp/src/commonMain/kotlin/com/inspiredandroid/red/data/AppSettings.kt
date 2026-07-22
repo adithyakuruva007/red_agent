@@ -31,12 +31,7 @@ enum class ImportSection {
     CONVERSATIONS,
 }
 
-enum class ThemeMode {
-    System,
-    Light,
-    Dark,
-    OledBlack,
-}
+
 
 enum class AppColorScheme {
     AdwaitaBlackLightBlue,
@@ -279,15 +274,7 @@ class AppSettings(internal val settings: Settings) {
         settings.putBoolean(KEY_DYNAMIC_UI_ENABLED, enabled)
     }
 
-    private val _themeModeFlow = MutableStateFlow(loadInitialThemeMode())
-    val themeModeFlow: StateFlow<ThemeMode> = _themeModeFlow
 
-    fun getThemeMode(): ThemeMode = _themeModeFlow.value
-
-    fun setThemeMode(mode: ThemeMode) {
-        settings.putString(KEY_THEME_MODE, mode.name)
-        _themeModeFlow.value = mode
-    }
 
     private val _colorSchemeFlow = MutableStateFlow(loadInitialColorScheme())
     val colorSchemeFlow: StateFlow<AppColorScheme> = _colorSchemeFlow
@@ -386,18 +373,7 @@ class AppSettings(internal val settings: Settings) {
 
 
 
-    private fun loadInitialThemeMode(): ThemeMode {
-        val raw = settings.getString(KEY_THEME_MODE, "")
-        if (raw.isNotEmpty()) {
-            return try {
-                ThemeMode.valueOf(raw)
-            } catch (_: IllegalArgumentException) {
-                ThemeMode.System
-            }
-        }
-        // Migrate the legacy boolean OLED toggle: true → OledBlack, false → System.
-        return if (settings.getBoolean(KEY_OLED_MODE_ENABLED, false)) ThemeMode.OledBlack else ThemeMode.System
-    }
+
 
     // Daemon mode
     fun isDaemonEnabled(): Boolean = settings.getBoolean(KEY_DAEMON_ENABLED, false)

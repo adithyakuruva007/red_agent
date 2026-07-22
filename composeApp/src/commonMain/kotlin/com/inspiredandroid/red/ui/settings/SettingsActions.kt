@@ -3,7 +3,6 @@ package com.inspiredandroid.red.ui.settings
 import androidx.compose.runtime.Immutable
 import com.inspiredandroid.red.data.ImportSection
 import com.inspiredandroid.red.data.Service
-import com.inspiredandroid.red.data.ThemeMode
 import com.inspiredandroid.red.inference.LocalModel
 import com.inspiredandroid.red.mcp.PopularMcpServer
 
@@ -20,7 +19,6 @@ data class SettingsActions(
     val onToggleTool: (String, Boolean) -> Unit,
     val onSaveSoul: (String) -> Unit,
     val onToggleDynamicUi: (Boolean) -> Unit,
-    val onChangeThemeMode: (ThemeMode) -> Unit,
     val onToggleMemory: (Boolean) -> Unit,
     val onDeleteMemory: (String) -> Unit,
     val onUpdateMemory: (String, String) -> Unit,
@@ -82,7 +80,6 @@ data class SettingsActions(
             onToggleTool = { _, _ -> },
             onSaveSoul = {},
             onToggleDynamicUi = {},
-            onChangeThemeMode = {},
             onToggleMemory = {},
             onDeleteMemory = {},
             onUpdateMemory = { _, _ -> },

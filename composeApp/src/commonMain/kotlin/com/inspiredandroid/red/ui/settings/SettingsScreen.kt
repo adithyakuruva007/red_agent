@@ -119,7 +119,6 @@ import com.inspiredandroid.red.data.Service
 import com.inspiredandroid.red.data.SharedJson
 import com.inspiredandroid.red.data.TaskStatus
 import com.inspiredandroid.red.data.TaskTrigger
-import com.inspiredandroid.red.data.ThemeMode
 import com.inspiredandroid.red.data.detectImportSections
 import com.inspiredandroid.red.formatFileSize
 import com.inspiredandroid.red.inference.DevicePerformance

@@ -1905,11 +1905,7 @@ class RemoteDataRepository(
         appSettings.setDynamicUiEnabled(enabled)
     }
 
-    override fun getThemeMode(): ThemeMode = appSettings.getThemeMode()
 
-    override fun setThemeMode(mode: ThemeMode) {
-        appSettings.setThemeMode(mode)
-    }
 
 
 

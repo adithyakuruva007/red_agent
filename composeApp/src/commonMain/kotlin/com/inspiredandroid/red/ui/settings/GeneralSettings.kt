@@ -25,7 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.inspiredandroid.red.data.ThemeMode
+
 import com.inspiredandroid.red.data.AppSettings
 import com.inspiredandroid.red.data.AppColorScheme
 import org.koin.compose.koinInject
@@ -80,12 +80,7 @@ internal fun GeneralContent(uiState: SettingsUiState, actions: SettingsActions) 
                             onToggleDynamicUi = actions.onToggleDynamicUi,
                         )
                     }
-                    SettingsCard {
-                        ThemeModeSection(
-                            themeMode = uiState.themeMode,
-                            onChangeThemeMode = actions.onChangeThemeMode,
-                        )
-                    }
+
                 }
                 Column(
                     modifier = Modifier.weight(1f),
@@ -124,12 +119,7 @@ internal fun GeneralContent(uiState: SettingsUiState, actions: SettingsActions) 
                         onToggleDynamicUi = actions.onToggleDynamicUi,
                     )
                 }
-                SettingsCard {
-                    ThemeModeSection(
-                        themeMode = uiState.themeMode,
-                        onChangeThemeMode = actions.onChangeThemeMode,
-                    )
-                }
+
 
                 if (uiState.showUiScale) {
                     SettingsCard {
@@ -151,82 +141,7 @@ internal fun GeneralContent(uiState: SettingsUiState, actions: SettingsActions) 
     }
 }
 
-@Composable
-private fun ThemeModeSection(
-    themeMode: ThemeMode,
-    onChangeThemeMode: (ThemeMode) -> Unit,
-) {
-    var expanded by remember { mutableStateOf(false) }
 
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier.fillMaxWidth().clickable { expanded = true }.handCursor(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = stringResource(Res.string.settings_theme),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onBackground,
-                )
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    text = stringResource(Res.string.settings_theme_description),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-            Box {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    modifier = Modifier
-                        .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
-                        .padding(horizontal = 12.dp, vertical = 8.dp)
-                ) {
-                    val modeLabel = when (themeMode) {
-                        ThemeMode.System -> stringResource(Res.string.settings_theme_system)
-                        ThemeMode.Light -> stringResource(Res.string.settings_theme_light)
-                        ThemeMode.Dark -> stringResource(Res.string.settings_theme_dark)
-                        ThemeMode.OledBlack -> stringResource(Res.string.settings_theme_oled)
-                    }
-                    Text(
-                        text = modeLabel,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
-                    Icon(
-                        imageVector = vectorResource(Res.drawable.ic_arrow_drop_down),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false },
-                    modifier = Modifier.background(MaterialTheme.colorScheme.surfaceVariant)
-                ) {
-                    ThemeMode.values().forEach { mode ->
-                        val modeLabel = when (mode) {
-                            ThemeMode.System -> stringResource(Res.string.settings_theme_system)
-                            ThemeMode.Light -> stringResource(Res.string.settings_theme_light)
-                            ThemeMode.Dark -> stringResource(Res.string.settings_theme_dark)
-                            ThemeMode.OledBlack -> stringResource(Res.string.settings_theme_oled)
-                        }
-                        DropdownMenuItem(
-                            text = { Text(modeLabel, color = MaterialTheme.colorScheme.onSurface) },
-                            onClick = {
-                                onChangeThemeMode(mode)
-                                expanded = false
-                            }
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
 
 @Composable
 private fun DaemonModeToggle(
