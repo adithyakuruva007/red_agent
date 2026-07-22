@@ -631,6 +631,7 @@ val searchFilesTool = object : Tool {
         ),
     )
 
+    override suspend fun execute(args: Map<String, Any>): Any {
         val dirPath = args["directory"]?.toString() ?: return mapOf("success" to false, "error" to "directory is required")
         val pattern = args["pattern"]?.toString() ?: return mapOf("success" to false, "error" to "pattern is required")
         return try {
@@ -654,9 +655,6 @@ val searchFilesTool = object : Tool {
                         "error" to "Storage permission not granted. Ask the user to grant storage/file permission in Settings -> Agent -> Access Local Storage."
                     )
                 }
-            }
-            if (!dir.exists() || !dir.isDirectory) {
-                return mapOf("success" to false, "error" to "Directory does not exist or is not a directory: $dirPath")
             }
             val regex = pattern.replace(".", "\\.").replace("*", ".*").replace("?", ".").toRegex(RegexOption.IGNORE_CASE)
             val results = dir.walkTopDown()
