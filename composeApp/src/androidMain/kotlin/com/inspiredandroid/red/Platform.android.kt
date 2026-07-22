@@ -631,26 +631,30 @@ val searchFilesTool = object : Tool {
         ),
     )
 
-    override suspend fun execute(args: Map<String, Any>): Any {
-        val context: Context by inject(Context::class.java)
-        val hasPermission = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-            android.os.Environment.isExternalStorageManager()
-        } else {
-            androidx.core.content.ContextCompat.checkSelfPermission(
-                context,
-                android.Manifest.permission.READ_EXTERNAL_STORAGE
-            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
-        }
-        if (!hasPermission) {
-            return mapOf(
-                "success" to false,
-                "error" to "Storage permission not granted. Ask the user to grant storage/file permission in Settings -> Agent -> Access Local Storage."
-            )
-        }
         val dirPath = args["directory"]?.toString() ?: return mapOf("success" to false, "error" to "directory is required")
         val pattern = args["pattern"]?.toString() ?: return mapOf("success" to false, "error" to "pattern is required")
         return try {
             val dir = File(dirPath)
+            if (!dir.exists() || !dir.isDirectory) {
+                return mapOf("success" to false, "error" to "Directory does not exist or is not a directory: $dirPath")
+            }
+            if (!dir.canRead()) {
+                val context: Context by inject(Context::class.java)
+                val hasPermission = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                    android.os.Environment.isExternalStorageManager()
+                } else {
+                    androidx.core.content.ContextCompat.checkSelfPermission(
+                        context,
+                        android.Manifest.permission.READ_EXTERNAL_STORAGE
+                    ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+                }
+                if (!hasPermission) {
+                    return mapOf(
+                        "success" to false,
+                        "error" to "Storage permission not granted. Ask the user to grant storage/file permission in Settings -> Agent -> Access Local Storage."
+                    )
+                }
+            }
             if (!dir.exists() || !dir.isDirectory) {
                 return mapOf("success" to false, "error" to "Directory does not exist or is not a directory: $dirPath")
             }
@@ -678,21 +682,6 @@ val readFileTool = object : Tool {
     )
 
     override suspend fun execute(args: Map<String, Any>): Any {
-        val context: Context by inject(Context::class.java)
-        val hasPermission = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-            android.os.Environment.isExternalStorageManager()
-        } else {
-            androidx.core.content.ContextCompat.checkSelfPermission(
-                context,
-                android.Manifest.permission.READ_EXTERNAL_STORAGE
-            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
-        }
-        if (!hasPermission) {
-            return mapOf(
-                "success" to false,
-                "error" to "Storage permission not granted. Ask the user to grant storage/file permission in Settings -> Agent -> Access Local Storage."
-            )
-        }
         val path = args["path"]?.toString() ?: return mapOf("success" to false, "error" to "path is required")
         return try {
             val file = File(path)
@@ -701,6 +690,23 @@ val readFileTool = object : Tool {
             }
             if (file.isDirectory) {
                 return mapOf("success" to false, "error" to "Path is a directory, not a file: $path")
+            }
+            if (!file.canRead()) {
+                val context: Context by inject(Context::class.java)
+                val hasPermission = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                    android.os.Environment.isExternalStorageManager()
+                } else {
+                    androidx.core.content.ContextCompat.checkSelfPermission(
+                        context,
+                        android.Manifest.permission.READ_EXTERNAL_STORAGE
+                    ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+                }
+                if (!hasPermission) {
+                    return mapOf(
+                        "success" to false,
+                        "error" to "Storage permission not granted. Ask the user to grant storage/file permission in Settings -> Agent -> Access Local Storage."
+                    )
+                }
             }
             val maxBytes = 256 * 1024
             val size = file.length()
@@ -731,25 +737,29 @@ val writeFileTool = object : Tool {
     )
 
     override suspend fun execute(args: Map<String, Any>): Any {
-        val context: Context by inject(Context::class.java)
-        val hasPermission = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-            android.os.Environment.isExternalStorageManager()
-        } else {
-            androidx.core.content.ContextCompat.checkSelfPermission(
-                context,
-                android.Manifest.permission.READ_EXTERNAL_STORAGE
-            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
-        }
-        if (!hasPermission) {
-            return mapOf(
-                "success" to false,
-                "error" to "Storage permission not granted. Ask the user to grant storage/file permission in Settings -> Agent -> Access Local Storage."
-            )
-        }
         val path = args["path"]?.toString() ?: return mapOf("success" to false, "error" to "path is required")
         val content = args["content"]?.toString() ?: return mapOf("success" to false, "error" to "content is required")
         return try {
             val file = File(path)
+            val parent = file.parentFile
+            val canWriteDirectly = (file.exists() && file.canWrite()) || (parent != null && parent.exists() && parent.canWrite())
+            if (!canWriteDirectly) {
+                val context: Context by inject(Context::class.java)
+                val hasPermission = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                    android.os.Environment.isExternalStorageManager()
+                } else {
+                    androidx.core.content.ContextCompat.checkSelfPermission(
+                        context,
+                        android.Manifest.permission.READ_EXTERNAL_STORAGE
+                    ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+                }
+                if (!hasPermission) {
+                    return mapOf(
+                        "success" to false,
+                        "error" to "Storage permission not granted. Ask the user to grant storage/file permission in Settings -> Agent -> Access Local Storage."
+                    )
+                }
+            }
             file.parentFile?.mkdirs()
             file.writeText(content)
             mapOf("success" to true, "path" to path, "message" to "File written successfully")
