@@ -194,7 +194,7 @@ fun getRedColorScheme(colors: RedColors, isDark: Boolean): ColorScheme {
     }
 }
 
-val RedColorScheme: ColorScheme @Composable get() = getRedColorScheme(LocalRedColors.current, !ColorScheme.isLightFlavor)
+val RedColorScheme: ColorScheme @Composable get() = getRedColorScheme(LocalRedColors.current, LocalRedColors.current != LightRedColors)
 
 val ColorScheme.isLightFlavor: Boolean @Composable get() = LocalRedColors.current == LightRedColors
 
