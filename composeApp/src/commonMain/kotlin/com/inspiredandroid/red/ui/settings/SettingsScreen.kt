@@ -69,6 +69,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import com.inspiredandroid.red.ui.redSwitchColors
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -700,6 +701,7 @@ internal fun ToggleableHeadline(
             checked = checked,
             onCheckedChange = null,
             interactionSource = switchInteractionSource,
+            colors = redSwitchColors(),
         )
     }
     Spacer(Modifier.size(4.dp))

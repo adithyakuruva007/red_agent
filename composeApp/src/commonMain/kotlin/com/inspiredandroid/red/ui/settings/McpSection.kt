@@ -30,6 +30,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import com.inspiredandroid.red.ui.redSwitchColors
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -179,6 +180,7 @@ private fun McpServerCard(
                 Switch(
                     checked = server.isEnabled,
                     onCheckedChange = onToggle,
+                    colors = redSwitchColors(),
                 )
 
                 Spacer(Modifier.width(8.dp))
@@ -236,6 +238,7 @@ private fun McpServerCard(
                             Switch(
                                 checked = tool.isEnabled,
                                 onCheckedChange = { enabled -> onToggleTool(tool.id, enabled) },
+                                colors = redSwitchColors(),
                             )
                         }
                     }

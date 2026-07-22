@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import com.inspiredandroid.red.ui.redSwitchColors
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -224,6 +225,7 @@ private fun ImportPreviewDialog(
                             checked = replace,
                             onCheckedChange = { replace = it },
                             modifier = Modifier.handCursor(),
+                            colors = redSwitchColors(),
                         )
                     }
                     Spacer(Modifier.height(12.dp))
