@@ -180,7 +180,6 @@ fun ReferenceComposer(
             }
         }
 
-        // Soft Rectangular Container
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -196,25 +195,23 @@ fun ReferenceComposer(
                     ),
                     shape = RoundedCornerShape(16.dp),
                 )
-                .padding(horizontal = 8.dp, vertical = 6.dp),
+                .padding(start = 6.dp, end = 12.dp, top = 6.dp, bottom = 6.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             // Plus Button (+) with Attachment Options Menu
-            Box {
+            Box(modifier = Modifier.padding(start = 4.dp)) {
                 IconButton(
                     onClick = { showAttachMenu = true },
                     modifier = Modifier
-                        .size(28.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(Color.White.copy(alpha = 0.06f))
+                        .size(24.dp)
                         .handCursor(),
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
                         contentDescription = "Add attachment",
                         tint = RedTextSecondary,
-                        modifier = Modifier.size(16.dp),
+                        modifier = Modifier.size(20.dp),
                     )
                 }
 
@@ -279,6 +276,7 @@ fun ReferenceComposer(
                 ServiceSelector(
                     services = availableServices,
                     onSelectService = onSelectService,
+                    modifier = Modifier.padding(start = 4.dp),
                 )
             }
 
@@ -341,7 +339,7 @@ fun ReferenceComposer(
                 enabled = canSend,
                 modifier = Modifier
                     .size(32.dp)
-                    .clip(RoundedCornerShape(8.dp))
+                    .clip(RoundedCornerShape(11.dp))
                     .background(
                         if (canSend) {
                             Brush.linearGradient(listOf(RedAccent, Color(0xFF3E5FCB)))
