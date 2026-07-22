@@ -65,36 +65,20 @@ fun ServiceSelector(
     var expanded by remember { mutableStateOf(false) }
 
     Box(modifier = modifier) {
-        Row(
+        Box(
             modifier = Modifier
+                .size(28.dp)
                 .clip(RoundedCornerShape(8.dp))
                 .background(Color.White.copy(alpha = 0.06f))
                 .clickable { expanded = true }
-                .handCursor()
-                .padding(horizontal = 8.dp, vertical = 5.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                .handCursor(),
+            contentAlignment = Alignment.Center,
         ) {
             Icon(
                 painter = painterResource(current.icon),
                 contentDescription = current.serviceName,
                 tint = RedAccent,
-                modifier = Modifier.size(15.dp),
-            )
-            Text(
-                text = current.modelId.ifEmpty { current.serviceName },
-                color = RedTextPrimary,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Medium,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.widthIn(max = 110.dp),
-            )
-            Icon(
-                imageVector = Icons.Default.KeyboardArrowDown,
-                contentDescription = "Select Model",
-                tint = RedTextSecondary,
-                modifier = Modifier.size(14.dp),
+                modifier = Modifier.size(16.dp),
             )
         }
 
