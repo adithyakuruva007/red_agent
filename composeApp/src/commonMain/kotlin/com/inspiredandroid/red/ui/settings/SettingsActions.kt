@@ -105,6 +105,7 @@ data class SettingsActions(
             onToggleSmsSend = {},
             onToggleSmsSendAutonomous = {},
             onToggleContacts = {},
+            onToggleStorage = {},
             onToggleNotifications = {},
             onOpenNotificationListenerSettings = {},
             onClearPendingNotifications = {},
