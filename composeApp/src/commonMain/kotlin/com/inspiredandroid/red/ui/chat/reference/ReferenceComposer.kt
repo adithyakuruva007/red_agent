@@ -195,7 +195,7 @@ fun ReferenceComposer(
                     ),
                     shape = RoundedCornerShape(16.dp),
                 )
-                .padding(start = 6.dp, end = 12.dp, top = 6.dp, bottom = 6.dp),
+                .padding(start = 6.dp, end = 8.dp, top = 6.dp, bottom = 6.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(6.dp),
         ) {
@@ -338,22 +338,14 @@ fun ReferenceComposer(
                 },
                 enabled = canSend,
                 modifier = Modifier
-                    .size(32.dp)
-                    .clip(RoundedCornerShape(11.dp))
-                    .background(
-                        if (canSend) {
-                            Brush.linearGradient(listOf(RedAccent, Color(0xFF3E5FCB)))
-                        } else {
-                            SolidColor(Color.White.copy(alpha = 0.08f))
-                        },
-                    )
+                    .size(28.dp)
                     .handCursor(),
             ) {
                 Icon(
                     imageVector = if (isLoading) Icons.Default.Stop else Icons.AutoMirrored.Filled.Send,
                     contentDescription = if (isLoading) "Cancel" else "Send",
                     tint = if (canSend) Color.White else RedTextTertiary,
-                    modifier = Modifier.size(16.dp),
+                    modifier = Modifier.size(20.dp),
                 )
             }
         }
