@@ -174,13 +174,13 @@ actual fun getAvailableTools(): List<Tool> {
             addAll(EmailTools.getEmailTools(emailStore))
         }
 
-        if (appSettings.isToolEnabled("search_files", defaultEnabled = true)) {
+        if (appSettings.isStorageEnabled() && appSettings.isToolEnabled("search_files", defaultEnabled = true)) {
             add(searchFilesTool)
         }
-        if (appSettings.isToolEnabled("read_file", defaultEnabled = true)) {
+        if (appSettings.isStorageEnabled() && appSettings.isToolEnabled("read_file", defaultEnabled = true)) {
             add(readFileTool)
         }
-        if (appSettings.isToolEnabled("write_file", defaultEnabled = true)) {
+        if (appSettings.isStorageEnabled() && appSettings.isToolEnabled("write_file", defaultEnabled = true)) {
             add(writeFileTool)
         }
 

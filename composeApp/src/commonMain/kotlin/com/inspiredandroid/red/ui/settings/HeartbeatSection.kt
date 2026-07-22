@@ -96,6 +96,9 @@ import red.composeapp.generated.resources.settings_sms_autonomous_label
 import red.composeapp.generated.resources.settings_contacts_description
 import red.composeapp.generated.resources.settings_contacts_label
 import red.composeapp.generated.resources.settings_contacts_permission_required
+import red.composeapp.generated.resources.settings_storage_description
+import red.composeapp.generated.resources.settings_storage_label
+import red.composeapp.generated.resources.settings_storage_permission_required
 import red.composeapp.generated.resources.settings_soul_reset
 import red.composeapp.generated.resources.settings_soul_reset_cancel
 import red.composeapp.generated.resources.settings_soul_save
@@ -686,6 +689,31 @@ internal fun ContactsSection(
                 message = stringResource(Res.string.settings_contacts_permission_required),
                 buttonLabel = stringResource(Res.string.settings_sms_permission_button),
                 onGrant = { onToggleContacts(true) },
+            )
+        }
+    }
+}
+
+@Composable
+internal fun StorageSection(
+    isStorageEnabled: Boolean,
+    permissionGranted: Boolean,
+    onToggleStorage: (Boolean) -> Unit,
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        ToggleableHeadline(
+            title = stringResource(Res.string.settings_storage_label),
+            description = stringResource(Res.string.settings_storage_description),
+            checked = isStorageEnabled,
+            onCheckedChange = onToggleStorage,
+        )
+
+        if (isStorageEnabled && !permissionGranted) {
+            Spacer(Modifier.height(8.dp))
+            PermissionRequiredRow(
+                message = stringResource(Res.string.settings_storage_permission_required),
+                buttonLabel = stringResource(Res.string.settings_sms_permission_button),
+                onGrant = { onToggleStorage(true) },
             )
         }
     }

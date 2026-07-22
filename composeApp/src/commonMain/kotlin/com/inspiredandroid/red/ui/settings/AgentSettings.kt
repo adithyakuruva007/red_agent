@@ -190,6 +190,15 @@ internal fun AgentContent(uiState: SettingsUiState, actions: SettingsActions) {
                             )
                         }
                     }
+                    if (uiState.showStorageSection) {
+                        SettingsCard {
+                            StorageSection(
+                                isStorageEnabled = uiState.isStorageEnabled,
+                                permissionGranted = uiState.storagePermissionGranted,
+                                onToggleStorage = actions.onToggleStorage,
+                            )
+                        }
+                    }
                     if (uiState.showNotificationsSection) {
                         SettingsCard {
                             NotificationsSection(
@@ -292,6 +301,15 @@ internal fun AgentContent(uiState: SettingsUiState, actions: SettingsActions) {
                             isContactsEnabled = uiState.isContactsEnabled,
                             permissionGranted = uiState.contactsPermissionGranted,
                             onToggleContacts = actions.onToggleContacts,
+                        )
+                    }
+                }
+                if (uiState.showStorageSection) {
+                    SettingsCard {
+                        StorageSection(
+                            isStorageEnabled = uiState.isStorageEnabled,
+                            permissionGranted = uiState.storagePermissionGranted,
+                            onToggleStorage = actions.onToggleStorage,
                         )
                     }
                 }

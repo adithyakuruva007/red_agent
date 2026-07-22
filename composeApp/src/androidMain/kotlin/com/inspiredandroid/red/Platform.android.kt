@@ -454,13 +454,13 @@ actual fun getAvailableTools(): List<Tool> {
             add(OpenFileTool)
         }
 
-        if (appSettings.isToolEnabled("search_files", defaultEnabled = true)) {
+        if (appSettings.isStorageEnabled() && appSettings.isToolEnabled("search_files", defaultEnabled = true)) {
             add(searchFilesTool)
         }
-        if (appSettings.isToolEnabled("read_file", defaultEnabled = true)) {
+        if (appSettings.isStorageEnabled() && appSettings.isToolEnabled("read_file", defaultEnabled = true)) {
             add(readFileTool)
         }
-        if (appSettings.isToolEnabled("write_file", defaultEnabled = true)) {
+        if (appSettings.isStorageEnabled() && appSettings.isToolEnabled("write_file", defaultEnabled = true)) {
             add(writeFileTool)
         }
 
@@ -632,6 +632,21 @@ val searchFilesTool = object : Tool {
     )
 
     override suspend fun execute(args: Map<String, Any>): Any {
+        val context: Context by inject(Context::class.java)
+        val hasPermission = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            android.os.Environment.isExternalStorageManager()
+        } else {
+            androidx.core.content.ContextCompat.checkSelfPermission(
+                context,
+                android.Manifest.permission.READ_EXTERNAL_STORAGE
+            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+        }
+        if (!hasPermission) {
+            return mapOf(
+                "success" to false,
+                "error" to "Storage permission not granted. Ask the user to grant storage/file permission in Settings -> Agent -> Access Local Storage."
+            )
+        }
         val dirPath = args["directory"]?.toString() ?: return mapOf("success" to false, "error" to "directory is required")
         val pattern = args["pattern"]?.toString() ?: return mapOf("success" to false, "error" to "pattern is required")
         return try {
@@ -663,6 +678,21 @@ val readFileTool = object : Tool {
     )
 
     override suspend fun execute(args: Map<String, Any>): Any {
+        val context: Context by inject(Context::class.java)
+        val hasPermission = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            android.os.Environment.isExternalStorageManager()
+        } else {
+            androidx.core.content.ContextCompat.checkSelfPermission(
+                context,
+                android.Manifest.permission.READ_EXTERNAL_STORAGE
+            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+        }
+        if (!hasPermission) {
+            return mapOf(
+                "success" to false,
+                "error" to "Storage permission not granted. Ask the user to grant storage/file permission in Settings -> Agent -> Access Local Storage."
+            )
+        }
         val path = args["path"]?.toString() ?: return mapOf("success" to false, "error" to "path is required")
         return try {
             val file = File(path)
@@ -701,6 +731,21 @@ val writeFileTool = object : Tool {
     )
 
     override suspend fun execute(args: Map<String, Any>): Any {
+        val context: Context by inject(Context::class.java)
+        val hasPermission = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            android.os.Environment.isExternalStorageManager()
+        } else {
+            androidx.core.content.ContextCompat.checkSelfPermission(
+                context,
+                android.Manifest.permission.READ_EXTERNAL_STORAGE
+            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+        }
+        if (!hasPermission) {
+            return mapOf(
+                "success" to false,
+                "error" to "Storage permission not granted. Ask the user to grant storage/file permission in Settings -> Agent -> Access Local Storage."
+            )
+        }
         val path = args["path"]?.toString() ?: return mapOf("success" to false, "error" to "path is required")
         val content = args["content"]?.toString() ?: return mapOf("success" to false, "error" to "content is required")
         return try {

@@ -549,6 +549,12 @@ class AppSettings(internal val settings: Settings) {
         settings.putBoolean(KEY_CONTACTS_ENABLED, enabled)
     }
 
+    fun isStorageEnabled(): Boolean = settings.getBoolean(KEY_STORAGE_ENABLED, false)
+
+    fun setStorageEnabled(enabled: Boolean) {
+        settings.putBoolean(KEY_STORAGE_ENABLED, enabled)
+    }
+
     // Notifications (FOSS-only, Android-only — settings layer is platform-agnostic, feature
     // gate is enforced by the listener service being declared only in foss/AndroidManifest.xml)
     fun isNotificationsEnabled(): Boolean = settings.getBoolean(KEY_NOTIFICATIONS_ENABLED, false)
@@ -624,6 +630,7 @@ class AppSettings(internal val settings: Settings) {
         const val KEY_SMS_SEND_AUTONOMOUS = "sms_send_autonomous"
         const val KEY_SMS_DRAFTS = "sms_drafts"
         const val KEY_CONTACTS_ENABLED = "contacts_enabled"
+        const val KEY_STORAGE_ENABLED = "storage_enabled"
 
         const val KEY_NOTIFICATIONS_ENABLED = "notifications_enabled"
         const val KEY_NOTIFICATIONS_PENDING = "notifications_pending"

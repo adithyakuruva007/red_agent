@@ -30,6 +30,7 @@ import com.inspiredandroid.red.tools.NotificationListenerController
 import com.inspiredandroid.red.tools.NotificationPermissionController
 import com.inspiredandroid.red.tools.SmsPermissionController
 import com.inspiredandroid.red.tools.SmsSendPermissionController
+import com.inspiredandroid.red.tools.StoragePermissionController
 import com.inspiredandroid.red.ui.chat.ChatViewModel
 import com.inspiredandroid.red.ui.sandbox.SandboxFileBrowserViewModel
 import com.inspiredandroid.red.ui.sandbox.SandboxPackagesViewModel
@@ -45,6 +46,7 @@ val appModule = module {
     single<NotificationPermissionController> { NotificationPermissionController() }
     single<SmsPermissionController> { SmsPermissionController() }
     single<SmsSendPermissionController> { SmsSendPermissionController() }
+    single<StoragePermissionController> { StoragePermissionController() }
     single<SmsReader> { SmsReader() }
     single<SmsSender> { SmsSender() }
     single<NotificationListenerController> { NotificationListenerController() }
@@ -115,6 +117,7 @@ val appModule = module {
             smsPermissionController = get(),
             smsSendPermissionController = get(),
             contactsPermissionController = get(),
+            storagePermissionController = get(),
             smsSender = get(),
             smsDraftStore = get(),
             notificationStore = get(),

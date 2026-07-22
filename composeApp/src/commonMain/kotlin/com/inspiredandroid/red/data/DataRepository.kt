@@ -171,6 +171,12 @@ interface DataRepository {
     fun hasContactsPermission(): Boolean
     suspend fun requestContactsPermission(): Boolean
 
+    // Storage / Files
+    fun isStorageEnabled(): Boolean
+    fun setStorageEnabled(enabled: Boolean)
+    fun hasStoragePermission(): Boolean
+    suspend fun requestStoragePermission(): Boolean
+
     // Notifications (FOSS-only on Android; other platforms return stub values).
     // Per-app filtering is delegated to the system Notification Access "Apps" picker.
     fun isNotificationsEnabled(): Boolean

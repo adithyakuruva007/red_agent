@@ -52,6 +52,7 @@ import com.inspiredandroid.red.tools.ContactsPermissionController
 import com.inspiredandroid.red.tools.NotificationListenerController
 import com.inspiredandroid.red.tools.SmsPermissionController
 import com.inspiredandroid.red.tools.SmsSendPermissionController
+import com.inspiredandroid.red.tools.StoragePermissionController
 import com.inspiredandroid.red.ui.chat.History
 import com.inspiredandroid.red.ui.chat.ToolCallInfo
 import com.inspiredandroid.red.ui.chat.toGeminiMessageDto
@@ -161,6 +162,7 @@ class RemoteDataRepository(
     private val smsPermissionController: SmsPermissionController,
     private val smsSendPermissionController: SmsSendPermissionController,
     private val contactsPermissionController: ContactsPermissionController,
+    private val storagePermissionController: StoragePermissionController,
     private val smsSender: SmsSender,
     private val smsDraftStore: SmsDraftStore,
     private val notificationStore: NotificationStore,
@@ -2085,6 +2087,17 @@ class RemoteDataRepository(
     override fun hasContactsPermission(): Boolean = contactsPermissionController.hasPermission()
 
     override suspend fun requestContactsPermission(): Boolean = contactsPermissionController.requestPermission()
+
+    // Storage / Files
+    override fun isStorageEnabled(): Boolean = appSettings.isStorageEnabled()
+
+    override fun setStorageEnabled(enabled: Boolean) {
+        appSettings.setStorageEnabled(enabled)
+    }
+
+    override fun hasStoragePermission(): Boolean = storagePermissionController.hasPermission()
+
+    override suspend fun requestStoragePermission(): Boolean = storagePermissionController.requestPermission()
 
     override fun isNotificationsEnabled(): Boolean = appSettings.isNotificationsEnabled()
 

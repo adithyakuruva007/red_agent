@@ -43,6 +43,7 @@ data class SettingsActions(
     val onToggleSmsSend: (Boolean) -> Unit,
     val onToggleSmsSendAutonomous: (Boolean) -> Unit,
     val onToggleContacts: (Boolean) -> Unit,
+    val onToggleStorage: (Boolean) -> Unit,
     val onToggleNotifications: (Boolean) -> Unit,
     val onOpenNotificationListenerSettings: () -> Unit,
     val onClearPendingNotifications: () -> Unit,

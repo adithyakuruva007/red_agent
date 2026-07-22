@@ -30,8 +30,10 @@ import com.inspiredandroid.red.tools.SetupContactsPermissionHandler
 import com.inspiredandroid.red.tools.SetupNotificationPermissionHandler
 import com.inspiredandroid.red.tools.SetupSmsPermissionHandler
 import com.inspiredandroid.red.tools.SetupSmsSendPermissionHandler
+import com.inspiredandroid.red.tools.SetupStoragePermissionHandler
 import com.inspiredandroid.red.tools.SmsPermissionController
 import com.inspiredandroid.red.tools.SmsSendPermissionController
+import com.inspiredandroid.red.tools.StoragePermissionController
 import com.inspiredandroid.red.ui.RedColorScheme
 import com.inspiredandroid.red.ui.rememberSandboxAwareUriHandler
 import com.inspiredandroid.red.ui.Theme
@@ -101,6 +103,9 @@ private fun AppContent(
 
     val contactsPermissionController = koinInject<ContactsPermissionController>()
     SetupContactsPermissionHandler(contactsPermissionController)
+
+    val storagePermissionController = koinInject<StoragePermissionController>()
+    SetupStoragePermissionHandler(storagePermissionController)
 
     LaunchedEffect(textToSpeech) {
         val tts = textToSpeech ?: return@LaunchedEffect

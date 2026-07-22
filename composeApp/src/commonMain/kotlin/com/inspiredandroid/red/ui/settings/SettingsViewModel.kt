@@ -111,6 +111,9 @@ class SettingsViewModel(
         showContactsSection = currentPlatform is Platform.Mobile,
         isContactsEnabled = dataRepository.isContactsEnabled(),
         contactsPermissionGranted = dataRepository.hasContactsPermission(),
+        showStorageSection = currentPlatform is Platform.Mobile || currentPlatform is Platform.Desktop,
+        isStorageEnabled = dataRepository.isStorageEnabled(),
+        storagePermissionGranted = dataRepository.hasStoragePermission(),
         showNotificationsSection = isNotificationsSupported,
         isNotificationsEnabled = dataRepository.isNotificationsEnabled(),
         notificationListenerAccessGranted = dataRepository.isNotificationListenerAccessGranted(),
@@ -167,6 +170,7 @@ class SettingsViewModel(
         onToggleSmsSend = ::onToggleSmsSend,
         onToggleSmsSendAutonomous = ::onToggleSmsSendAutonomous,
         onToggleContacts = ::onToggleContacts,
+        onToggleStorage = ::onToggleStorage,
         onToggleNotifications = ::onToggleNotifications,
         onOpenNotificationListenerSettings = ::onOpenNotificationListenerSettings,
         onClearPendingNotifications = ::onClearPendingNotifications,
@@ -238,6 +242,16 @@ class SettingsViewModel(
     fun onScreenVisible() {
         checkAllConnections()
         connectEnabledMcpServers()
+        
+        _state.update {
+            it.copy(
+                smsPermissionGranted = dataRepository.hasSmsPermission(),
+                smsSendPermissionGranted = dataRepository.hasSmsSendPermission(),
+                contactsPermissionGranted = dataRepository.hasContactsPermission(),
+                storagePermissionGranted = dataRepository.hasStoragePermission(),
+            )
+        }
+
         // Re-read notification listener state every time the screen becomes visible:
         // the user may have toggled access in system settings while we were backgrounded.
         if (isNotificationsSupported) {
@@ -610,6 +624,19 @@ class SettingsViewModel(
         } else {
             dataRepository.setContactsEnabled(enabled)
             _state.update { it.copy(isContactsEnabled = enabled) }
+        }
+    }
+
+    private fun onToggleStorage(enabled: Boolean) {
+        if (enabled && !dataRepository.hasStoragePermission()) {
+            viewModelScope.launch(backgroundDispatcher) {
+                val granted = dataRepository.requestStoragePermission()
+                _state.update { it.copy(storagePermissionGranted = granted, isStorageEnabled = granted) }
+                if (granted) dataRepository.setStorageEnabled(true)
+            }
+        } else {
+            dataRepository.setStorageEnabled(enabled)
+            _state.update { it.copy(isStorageEnabled = enabled) }
         }
     }
 

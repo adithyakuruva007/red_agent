@@ -101,6 +101,10 @@ data class SettingsUiState(
     val isContactsEnabled: Boolean = false,
     val contactsPermissionGranted: Boolean = false,
 
+    val showStorageSection: Boolean = false,
+    val isStorageEnabled: Boolean = false,
+    val storagePermissionGranted: Boolean = false,
+
     val showNotificationsSection: Boolean = false,
     val isNotificationsEnabled: Boolean = false,
     val notificationListenerAccessGranted: Boolean = false,

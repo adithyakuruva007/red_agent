@@ -208,6 +208,9 @@
     <string name="settings_contacts_label">Access Contacts</string>
     <string name="settings_contacts_description">Allow the agent to access your device contacts.</string>
     <string name="settings_contacts_permission_required">Grant the Contacts permission to enable this feature.</string>
+    <string name="settings_storage_label">Access Local Storage</string>
+    <string name="settings_storage_description">Allow the agent to search, read, and write files on local storage (e.g. music, documents, downloads).</string>
+    <string name="settings_storage_permission_required">Grant the Files/Storage permission to enable this feature.</string>
     <string name="sms_draft_banner_to">To %1$s</string>
     <string name="sms_draft_banner_send">Send</string>
     <string name="sms_draft_banner_discard">Discard</string>
